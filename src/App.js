@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // Make sure to create an App.css file and add styles there
+import './App.css';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -104,7 +104,7 @@ function App() {
             } else {
               webcamRunning = true;
               enableWebcamButton.innerText = "DISABLE PREDICTIONS";
-              setLoading(true); // Set loading to true when starting to enable the webcam
+              setLoading(true);
             }
 
             const constraints = {
@@ -114,7 +114,7 @@ function App() {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.addEventListener("loadeddata", () => {
-              setLoading(false); // Set loading to false once the data is loaded
+              setLoading(false);
               predictWebcam();
             });
           }
@@ -176,25 +176,67 @@ function App() {
         </div>
       )}
       {!showSplash && (
-        <div>
-          <h1>Musculoskeletal Analysis Squat Tool</h1>
-          <section id="demos" className="invisible">
-            <div id="liveView" className="videoView">
-              <button id="webcamButton" className="mdc-button mdc-button--raised">
-                <span className="mdc-button__ripple"></span>
-                <span className="mdc-button__label">ENABLE WEBCAM</span>
+        <div class="wrapper">
+          <header>
+            <h1>Musculoskeletal Analysis Squat Tool</h1>
+          </header>
+          <section>
+            <div class="button-group">
+              <button id="athButton" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">Athletic performance</span>
               </button>
-              <div style={{ position: 'relative', paddingTop: '1em'}}>
-                <video id="webcam" style={{ width: '1280px', height: '720px', position: 'absolute' }} autoPlay playsInline></video>
-                <canvas className="output_canvas" id="output_canvas" width="1280" height="720"></canvas>
-                {loading && (
-                  <div className="loading-overlay">
-                    <p>Loading</p>
-                  </div>
-                )}
+              <div class="dropdown">
+                <button id="injButton" class="mdc-button mdc-button--raised dropdown-toggle">
+                  <span class="mdc-button__label">Injury prevention</span>
+                </button>
+                <div class="dropdown-content">
+                  <label><input type="checkbox" name="injOptions" value="shoulders" /> Shoulders</label>
+                  <label><input type="checkbox" name="injOptions" value="elbows" /> Elbows</label>
+                  <label><input type="checkbox" name="injOptions" value="wrists" /> Wrists</label>
+                  <label><input type="checkbox" name="injOptions" value="hips" /> Hips</label>
+                  <label><input type="checkbox" name="injOptions" value="knees" /> Knees</label>
+                  <label><input type="checkbox" name="injOptions" value="ankles" /> Ankles</label>
+                </div>
+              </div>
+              <div class="dropdown">
+                <button id="rehButton" class="mdc-button mdc-button--raised dropdown-toggle">
+                  <span class="mdc-button__label">Injury Rehabilitation</span>
+                </button>
+                <div class="dropdown-content">
+                  <label><input type="checkbox" name="rehOptions" value="shoulders" /> Shoulders</label>
+                  <label><input type="checkbox" name="rehOptions" value="elbows" /> Elbows</label>
+                  <label><input type="checkbox" name="rehOptions" value="wrists" /> Wrists</label>
+                  <label><input type="checkbox" name="rehOptions" value="hips" /> Hips</label>
+                  <label><input type="checkbox" name="rehOptions" value="knees" /> Knees</label>
+                  <label><input type="checkbox" name="rehOptions" value="ankles" /> Ankles</label>
+                </div>
               </div>
             </div>
           </section>
+          <main id="demos" className="invisible" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+            <button id="webcamButton" className="mdc-button mdc-button--raised">
+              <span className="mdc-button__ripple"></span>
+              <span className="mdc-button__label">ENABLE WEBCAM</span>
+            </button>
+            <div style={{ position: 'relative', paddingTop: '1em', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <video id="webcam" style={{ width: '1280px', height: '720px', position: 'absolute' }} autoPlay playsInline></video>
+              <canvas className="output_canvas" id="output_canvas" width="1280" height="720"></canvas>
+              {loading && (
+                <div className="loading-overlay">
+                  <p>Loading</p>
+                </div>
+              )}
+            </div>
+          </main>
+          <section>
+            <h2>Results</h2>
+            <div class="results">
+              <p>res_1</p>
+            </div>
+          </section>
+          <footer>
+            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact us at <a href="mailto:di236@exeter.ac.uk">di236@exeter.ac.uk</a>.</p>
+          </footer>
         </div>
       )}
     </div>
