@@ -41,6 +41,7 @@ section:nth-child(4) {
   grid-column: span 9;
   background-color: rgb(247, 247, 247);
   padding: 10px;
+  margin-bottom: 2em;
 }
 
 .videoView, .detectOnClick {
