@@ -1,20 +1,33 @@
+/*--------------------Content tags--------------------*/
 body {
   margin: 0;
 }
-
-.wrapper {
-  display: grid;
-  grid-template-rows: auto auto auto auto auto;
-  width: 100%;
-  height: 100%;
-}
-
 header {
   grid-column: span 9;
   background-color: rgb(240, 240, 240);
   text-align: center;
+  clear: both;
 }
-
+main {
+  grid-column: span 9;
+  padding: 10px;
+}
+section:nth-child(2) {
+  grid-column: span 9;
+  padding: 10px;
+  margin: 0 auto;
+  display: block;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+}
+section:nth-child(4) {
+  grid-column: span 9;
+  background-color: rgb(247, 247, 247);
+  padding: 10px;
+  margin-bottom: 2em;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+}
 footer {
   grid-column: span 9;
   background-color: rgb(240, 240, 240);
@@ -23,27 +36,32 @@ footer {
   left: 0;
   bottom: 0;
   width: 100%;
+  clear: both;
+}
+h1 {
+  text-align: center;
+  color: #207178;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-section:nth-child(2) {
-  grid-column: span 9;
-  padding: 10px;
-  margin: 0 auto;
+h2 {
+  clear: both;
+  font-family: Arial, Helvetica, sans-serif;
+}
+video {
+  clear: both;
   display: block;
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
 }
-
-main {
-  grid-column: span 9;
-  padding: 10px;
+/*--------------------Class Tags--------------------*/
+.wrapper {
+  display: grid;
+  grid-template-rows: auto auto auto auto auto;
+  width: 100%;
+  height: 100%;
 }
-
-section:nth-child(4) {
-  grid-column: span 9;
-  background-color: rgb(247, 247, 247);
-  padding: 10px;
-  margin-bottom: 2em;
-}
-
 .videoView, .detectOnClick {
   text-align: center;
   margin-left: auto;
@@ -107,9 +125,10 @@ section:nth-child(4) {
 }
 
 .splash-content {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
 .splash-image {
   max-width: 40%;
   height: auto;
@@ -136,66 +155,15 @@ section:nth-child(4) {
   z-index: 1000;
   font-family: Arial, Helvetica, sans-serif;
 }
-
-#webcamButton {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  letter-spacing: 2px;
-  text-decoration: none;
-  text-transform: uppercase;
-  color: #000;
-  cursor: pointer;
-  border: 3px solid;
-  padding: 0.25em 0.5em;
-  box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+.loading-background {
+  background-color: grey;
+  width: 1280px;
+  height: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  margin:0 auto;
-  display:block;
-  width: 100%;
 }
-
-#webcamButton:active {
-  box-shadow: 0px 0px 0px 0px;
-  top: 5px;
-  left: 5px;
-}
-
-h1 {
-  text-align: center;
-  color: #207178;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-h2 {
-  clear: both;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-em {
-  font-weight: bold;
-}
-
-video {
-  clear: both;
-  display: block;
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  -moz-transform: rotateY(180deg);
-}
-
-section {
-  opacity: 1;
-  transition: opacity 500ms ease-in-out;
-}
-
-header,
-footer {
-  clear: both;
-}
-
 .removed {
   display: none;
 }
@@ -259,4 +227,63 @@ footer {
 }
 .dropdown-content label:hover {
   background-color: #f1f1f1;
+}
+.weightLabel{padding-right: 1em;}
+/*--------------------Id Tags--------------------*/
+#splash-uni {
+  width: 5%;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+}
+#demos{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#video{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#webcam {
+  width: 1280px;
+  height: 720px;
+  position: absolute;
+}
+
+#webcamButton {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  border: 3px solid;
+  padding: 0.25em 0.5em;
+  box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin:0 auto;
+  display:block;
+  width: 100%;
+}
+
+#webcamButton:active {
+  box-shadow: 0px 0px 0px 0px;
+  top: 5px;
+  left: 5px;
+}
+#weights {
+  margin: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family:Arial, Helvetica, sans-serif
 }

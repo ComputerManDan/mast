@@ -5,6 +5,10 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
+  const [bodyWeight, setBodyWeight] = useState('');
+  const [additionalWeight, setAdditionalWeight] = useState('');
+  const [weightUnit, setWeightUnit] = useState('kg');
+  const [isWebcamEnabled, setIsWebcamEnabled] = useState(false);
 
   useEffect(() => {
     if (!showSplash) {
@@ -103,20 +107,22 @@ function App() {
               console.log("Wait! poseLandmaker not loaded yet.");
               return;
             }
-
+          
             if (webcamRunning === true) {
               webcamRunning = false;
               enableWebcamButton.innerText = "ENABLE PREDICTIONS";
+              setIsWebcamEnabled(false);
             } else {
               webcamRunning = true;
               enableWebcamButton.innerText = "DISABLE PREDICTIONS";
               setLoading(true);
+              setIsWebcamEnabled(true);
             }
-
+          
             const constraints = {
               video: true
             };
-
+          
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.addEventListener("loadeddata", () => {
@@ -287,7 +293,7 @@ function App() {
 
   const formattedResults = [
     `Head angle: ${combinedAngleDegrees} degrees (Front view: ${adjustedFrontViewAngle.toFixed(2)}, Side view: ${adjustedSideViewAngle.toFixed(2)})`,
-    `Spinal uprightness / Shoulder troque: ${shoulderUprightness.toFixed(2)} degrees`,
+    `Spinal uprightness / Shoulder torque: ${shoulderUprightness.toFixed(2)} degrees`,
     `Combined elbow angle: ${combinedElbowAngle.toFixed(2)} degrees (Left elbow angle: ${leftElbowAngle.toFixed(2)} degrees) (Right elbow angle: ${rightElbowAngle.toFixed(2)} degrees)`,
     `Combined wrist angle: ${combinedWristAngle.toFixed(2)} degrees (Left wrist angle: ${leftWristAngle.toFixed(2)} degrees) (Right wrist angle: ${rightWristAngle.toFixed(2)} degrees)`,
     `Combined hip angle: ${combinedHipAngle.toFixed(2)} degrees (Left hip angle: ${leftHipAngle.toFixed(2)} degrees) (Right hip angle: ${rightHipAngle.toFixed(2)} degrees)`,
@@ -297,6 +303,7 @@ function App() {
   ];
 
   setResults(formattedResults);
+  
 };
   
   return (
@@ -304,6 +311,7 @@ function App() {
       {showSplash && (
         <div className="splash-screen" onClick={() => setShowSplash(false)}>
           <div className="splash-content">
+            <img src="exeter.jpg" alt="Exeter University Background" id="splash-uni"/>
             <img src="logomast.png" alt="Splash Background" className="splash-image" />
             <h2 className="splash-text">Tap to Continue</h2>
           </div>
@@ -347,17 +355,37 @@ function App() {
               </div>
             </div>
           </section>
-          <main id="demos" className="invisible" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+          <main id="demos" className="invisible">
             <button id="webcamButton" className="mdc-button mdc-button--raised">
               <span className="mdc-button__ripple"></span>
               <span className="mdc-button__label">ENABLE WEBCAM</span>
             </button>
-            <div style={{ position: 'relative', paddingTop: '1em', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <video id="webcam" style={{ width: '1280px', height: '720px', position: 'absolute' }} autoPlay playsInline></video>
-              <canvas className="output_canvas" id="output_canvas" width="1280" height="720"></canvas>
+            <div id="weights">
+              <label class="weightLabel">
+                Body Weight:
+                <input type="number" value={bodyWeight} onChange={(e) => setBodyWeight(e.target.value)} class="inputs"/>
+              </label>
+              <label class="weightLabel">
+                Additional Weight:
+                <input type="number" value={additionalWeight} onChange={(e) => setAdditionalWeight(e.target.value)} class="inputs"/>
+              </label>
+              <label class="weightLabel">
+                Unit:
+                <select value={weightUnit} onChange={(e) => setWeightUnit(e.target.value)} class="inputs">
+                  <option value="kg">Kg</option>
+                  <option value="lbs">Lbs</option>
+                </select>
+              </label>
+            </div>
+            <div id="video">
+              {!isWebcamEnabled && <img src="logomast.png" alt="Placeholder" style={{ width: '1280px', height: '720px' }} />}
+              <video id="webcam" style={{ width: '1280px', height: '720px', position: isWebcamEnabled ? 'absolute' : 'relative', display: isWebcamEnabled ? 'block' : 'none' }} autoPlay playsInline></video>
+              <canvas className="output_canvas" id="output_canvas" width="1280" height="720" style={{ display: isWebcamEnabled && !loading ? 'block' : 'none' }}></canvas>
               {loading && (
-                <div className="loading-overlay">
-                  <p>Loading</p>
+                <div className="loading-background">
+                  <div className="loading-overlay">
+                    <p>Loading</p>
+                  </div>
                 </div>
               )}
             </div>
