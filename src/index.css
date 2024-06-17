@@ -233,8 +233,8 @@ video {
 #splash-uni {
   width: 5%;
   position: absolute;
-  top: 1em;
-  left: 1em;
+  bottom: 1em;
+  right: 1em;
 }
 #demos{
   display: flex;
