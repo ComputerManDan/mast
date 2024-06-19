@@ -22,6 +22,7 @@ const FirstSection = () => {
             <label><input type="checkbox" name="injOptions" value="shoulders" /> Shoulders</label>
             <label><input type="checkbox" name="injOptions" value="elbows" /> Elbows</label>
             <label><input type="checkbox" name="injOptions" value="wrists" /> Wrists</label>
+            <label><input type="checkbox" name="injOptions" value="lowerBack" /> Lower Back</label>
             <label><input type="checkbox" name="injOptions" value="hips" /> Hips</label>
             <label><input type="checkbox" name="injOptions" value="knees" /> Knees</label>
             <label><input type="checkbox" name="injOptions" value="ankles" /> Ankles</label>
@@ -35,6 +36,7 @@ const FirstSection = () => {
             <label><input type="checkbox" name="rehOptions" value="shoulders" /> Shoulders</label>
             <label><input type="checkbox" name="rehOptions" value="elbows" /> Elbows</label>
             <label><input type="checkbox" name="rehOptions" value="wrists" /> Wrists</label>
+            <label><input type="checkbox" name="injOptions" value="lowerBack" /> Lower Back</label>
             <label><input type="checkbox" name="rehOptions" value="hips" /> Hips</label>
             <label><input type="checkbox" name="rehOptions" value="knees" /> Knees</label>
             <label><input type="checkbox" name="rehOptions" value="ankles" /> Ankles</label>

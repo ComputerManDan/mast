@@ -13,6 +13,8 @@ function App() {
   const [weightUnit, setWeightUnit] = useState('kg');
   const [isWebcamEnabled, setIsWebcamEnabled] = useState(false);
   const [forceVecResults, setForceVecResults] = useState([]); // Added this state for storing the force vector results
+  const [analysisMet, setanalysisMet] = useState([]); // Added this state for storing the force vector results
+
 
   const calculateAngle = useCallback((A, B, C) => {
     const AB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
@@ -27,18 +29,78 @@ function App() {
   }, []);
   
 
-  const calculateForceVectors = useCallback((jointData) => {
+  const calculateDistance = (A, B) => {
+    return Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2 + (A.z - B.z) ** 2);
+  };
+  
+  const calculateForceVectors = useCallback((jointData, combinedHipAngle, combinedKneeAngle, combinedAnkleAngle, shoulderUprightness, landmarks) => {
     const totalWeight = parseFloat(bodyWeight) + parseFloat(additionalWeight);
     const weightMultiplier = weightUnit === 'lbs' ? 0.453592 : 1; // Convert lbs to kg if needed
     const weightInKg = totalWeight * weightMultiplier;
   
-    const forceVectors = jointData.map(({ joint, angle }) => {
-      const force = weightInKg * (angle / 180);
-      return `${joint}: ${force.toFixed(2)} kg at ${angle.toFixed(2)} degrees`;
-    });
+    // Ground Reaction Force (GRF) - Assuming vertical direction for simplicity
+    const GRF = weightInKg * 9.81; // Convert to Newtons
+  
+    // Weight distribution
+    const weightAboveHips = weightInKg * 0.3;
+    const weightBelowHips = weightInKg * 0.7;
+  
+    const lowerBackLoad = shoulderUprightness < 90 ? weightAboveHips * (1 - (shoulderUprightness / 90)) : 0;
+    const hipLoad = weightBelowHips * (combinedHipAngle / 90);
+    const kneeLoad = weightBelowHips * (combinedKneeAngle / 90);
+    const ankleLoad = weightBelowHips * (combinedAnkleAngle / 90);
+  
+    // Calculate distances (moment arms) for more accurate muscle forces and torques
+    const hipToKneeDistance = calculateDistance(landmarks[23], landmarks[25]); // Left hip to left knee
+    const kneeToAnkleDistance = calculateDistance(landmarks[25], landmarks[27]); // Left knee to left ankle
+    const ankleToFootDistance = calculateDistance(landmarks[27], landmarks[31]); // Left ankle to left foot index
+  
+    // More accurate Muscle Forces using distances
+    const quadricepsForce = kneeLoad * hipToKneeDistance; // Quadriceps contribution
+    const hamstringsForce = hipLoad * hipToKneeDistance; // Hamstrings contribution
+    const gluteusMaximusForce = hipLoad * hipToKneeDistance; // Glutes contribution
+    const gastrocnemiusForce = ankleLoad * kneeToAnkleDistance; // Gastrocnemius contribution
+  
+    // More accurate Torques at each joint
+    const hipTorque = hipLoad * hipToKneeDistance; // Torque at hip
+    const kneeTorque = kneeLoad * kneeToAnkleDistance; // Torque at knee
+    const ankleTorque = ankleLoad * ankleToFootDistance; // Torque at ankle
+  
+
+    
+    // Calculate total calculated load
+    const totalCalculatedLoad = lowerBackLoad + hipLoad + kneeLoad + ankleLoad;
+    
+    // Normalize loads to ensure their sum equals total weight
+    const normalizationFactor = weightInKg / totalCalculatedLoad;
+    
+    const normalizedLowerBackLoad = lowerBackLoad * normalizationFactor;
+    const normalizedHipLoad = hipLoad * normalizationFactor;
+    const normalizedKneeLoad = kneeLoad * normalizationFactor;
+    const normalizedAnkleLoad = ankleLoad * normalizationFactor;
+    
+    // Update force vectors with normalized loads
+    const forceVectors = [
+      `Lower Back Load: ${normalizedLowerBackLoad.toFixed(2)} kg`,
+      `Hip Load: ${normalizedHipLoad.toFixed(2)} kg`,
+      `Knee Load: ${normalizedKneeLoad.toFixed(2)} kg`,
+      `Ankle Load: ${normalizedAnkleLoad.toFixed(2)} kg`,
+    ];
+    const analysisMet = [
+      `Ground Reaction Force: ${GRF.toFixed(2)} N`,
+      `Quadriceps Force: ${quadricepsForce.toFixed(2)} N`,
+      `Hamstrings Force: ${hamstringsForce.toFixed(2)} N`,
+      `Gluteus Maximus Force: ${gluteusMaximusForce.toFixed(2)} N`,
+      `Gastrocnemius Force: ${gastrocnemiusForce.toFixed(2)} N`,
+      `Hip Torque: ${hipTorque.toFixed(2)} Nm`,
+      `Knee Torque: ${kneeTorque.toFixed(2)} Nm`,
+      `Ankle Torque: ${ankleTorque.toFixed(2)} Nm`
+    ];
   
     setForceVecResults(forceVectors);
+    setanalysisMet(analysisMet);
   }, [bodyWeight, additionalWeight, weightUnit]);
+  
   
   
   const displayResults = useCallback((landmarksArray) => {
@@ -142,7 +204,7 @@ function App() {
       { joint: 'Ankle', angle: combinedAnkleAngle },
     ];
   
-    calculateForceVectors(jointData);
+    calculateForceVectors(jointData, combinedHipAngle, combinedKneeAngle, combinedAnkleAngle, shoulderUprightness, landmarks);
   
     const formattedResults = [
       `Head angle: ${Number(combinedAngleDegrees).toFixed(2)} degrees (Front view: ${Number(adjustedFrontViewAngle).toFixed(2)}, Side view: ${Number(adjustedSideViewAngle).toFixed(2)})`,
@@ -157,6 +219,7 @@ function App() {
   
     setResults(formattedResults);
   }, [calculateAngle, calculateForceVectors]);
+  
   
 
   useEffect(() => {
@@ -183,23 +246,11 @@ function App() {
             <div id="weights">
               <label className="weightLabel">
                 Body Weight:
-                <input
-                  type="number"
-                  value={bodyWeight}
-                  onChange={(e) => setBodyWeight(e.target.value)}
-                  className="inputs"
-                  disabled={isWebcamEnabled}
-                />
+                <input type="number" value={bodyWeight} onChange={(e) => setBodyWeight(e.target.value)} className="inputs" disabled={isWebcamEnabled} required/>
               </label>
               <label className="weightLabel">
                 Additional Weight:
-                <input
-                  type="number"
-                  value={additionalWeight}
-                  onChange={(e) => setAdditionalWeight(e.target.value)}
-                  className="inputs"
-                  disabled={isWebcamEnabled}
-                />
+                <input type="number" value={additionalWeight} onChange={(e) => setAdditionalWeight(e.target.value)} className="inputs" disabled={isWebcamEnabled} required/>
               </label>
               <label className="weightLabel">
                 Unit:
@@ -241,6 +292,9 @@ function App() {
                 ))}
               </div>
               <div className="analysisMet">
+                {analysisMet.map((result, index) => (
+                    <p key={index}>{result}</p>
+                  ))}
               </div>
               <div className="analysisWords">
               </div>

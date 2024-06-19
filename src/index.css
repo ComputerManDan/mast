@@ -229,6 +229,16 @@ video {
   background-color: #f1f1f1;
 }
 .weightLabel{padding-right: 1em;}
+.results {
+  display: flex;
+  flex-direction: row;
+  gap: 1em; /* Optional: Add space between the divs */
+}
+
+.angles, .forceVec, .analysisMet, .analysisWords {
+  flex: 1; /* Make all divs take equal space */
+  text-align: center;
+}
 /*--------------------Id Tags--------------------*/
 #splash-uni {
   width: 5%;
