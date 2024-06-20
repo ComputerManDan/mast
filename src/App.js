@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
-import SplashScreen from './components/SplashScreen';
 import { loadPoseLandmarker } from "./components/poseLandmarker";
-import FirstSection from './components/FirstSection';
+import AppContent from './AppContent';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -60,8 +59,6 @@ function App() {
     const kneeTorque = kneeLoad * kneeToAnkleDistance; // Torque at knee
     const ankleTorque = ankleLoad * ankleToFootDistance; // Torque at ankle
   
-
-    
     // Calculate total calculated load
     const totalCalculatedLoad = lowerBackLoad + hipLoad + kneeLoad + ankleLoad;
     
@@ -203,7 +200,7 @@ function App() {
     ];
 
     setResults(formattedResults);
-  }, [calculateAngle, calculateForceVectors, calculateDistance]);
+  }, [calculateAngle, calculateForceVectors]);
 
   const displayResults = useCallback((landmarksArray) => {
     if (!landmarksArray || landmarksArray.length === 0 || !landmarksArray[0].length) {
@@ -224,78 +221,23 @@ function App() {
   }, [showSplash, displayResults]);
 
   return (
-    <div>
-      {showSplash && <SplashScreen setShowSplash={setShowSplash} />}
-      {!showSplash && (
-        <div className="wrapper">
-          <header>
-            <h1>Musculoskeletal Analysis Squat Tool</h1>
-          </header>
-          <FirstSection />
-          <main id="demos" className="invisible">
-            <button id="webcamButton" className="mdc-button mdc-button--raised" onClick={() => setIsWebcamEnabled(true)}>
-              <span className="mdc-button__ripple"></span>
-              <span className="mdc-button__label">ENABLE WEBCAM</span>
-            </button>
-            <div id="weights">
-              <label className="weightLabel">
-                Body Weight:
-                <input type="number" value={bodyWeight} onChange={(e) => setBodyWeight(e.target.value)} className="inputs" disabled={isWebcamEnabled} required />
-              </label>
-              <label className="weightLabel">
-                Additional Weight:
-                <input type="number" value={additionalWeight} onChange={(e) => setAdditionalWeight(e.target.value)} className="inputs" disabled={isWebcamEnabled} required />
-              </label>
-              <label className="weightLabel">
-                Unit:
-                <select value={weightUnit} onChange={(e) => setWeightUnit(e.target.value)} className="inputs" disabled={isWebcamEnabled}>
-                  <option value="kg">Kg</option>
-                  <option value="lbs">Lbs</option>
-                </select>
-              </label>
-            </div>
-            <div id="video">
-              {!isWebcamEnabled && <img src="logomast.png" alt="Placeholder" style={{ width: '1280px', height: '720px' }} />}
-              <video id="webcam" style={{ width: '1280px', height: '720px', position: isWebcamEnabled ? 'absolute' : 'relative', display: isWebcamEnabled ? 'block' : 'none' }} autoPlay playsInline></video>
-              <canvas className="output_canvas" id="output_canvas" width="1280" height="720" style={{ display: isWebcamEnabled && !loading ? 'block' : 'none' }}></canvas>
-              {loading && (
-                <div className="loading-background">
-                  <div className="loading-overlay">
-                    <p>Loading</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </main>
-          <section>
-            <h2>Results</h2>
-            <div className="results">
-              <div className="angles">
-                {results.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
-              <div className="forceVec">
-                {forceVecResults.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
-              <div className="analysisMet">
-                {analysisMet.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
-              <div className="analysisWords">
-              </div>
-            </div>
-          </section>
-          <footer>
-            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact us at <a href="mailto:di236@exeter.ac.uk">di236@exeter.ac.uk</a>.</p>
-          </footer>
-        </div>
-      )}
-    </div>
+    <AppContent
+      showSplash={showSplash}
+      setShowSplash={setShowSplash}
+      bodyWeight={bodyWeight}
+      setBodyWeight={setBodyWeight}
+      additionalWeight={additionalWeight}
+      setAdditionalWeight={setAdditionalWeight}
+      weightUnit={weightUnit}
+      setWeightUnit={setWeightUnit}
+      isWebcamEnabled={isWebcamEnabled}
+      setIsWebcamEnabled={setIsWebcamEnabled}
+      loading={loading}
+      results={results}
+      forceVecResults={forceVecResults}
+      analysisMet={analysisMet}
+    />
   );
-}
+};
 
 export default App;
