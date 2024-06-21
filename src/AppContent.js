@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet }) => {
+const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice }) => {
   return (
     <div>
       {showSplash && (
@@ -37,6 +37,7 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                     <label><input type="checkbox" name="injOptions" value="shoulders" /> Shoulders</label>
                     <label><input type="checkbox" name="injOptions" value="elbows" /> Elbows</label>
                     <label><input type="checkbox" name="injOptions" value="wrists" /> Wrists</label>
+                    <label><input type="checkbox" name="injOptions" value="back" /> Lower Back</label>
                     <label><input type="checkbox" name="injOptions" value="hips" /> Hips</label>
                     <label><input type="checkbox" name="injOptions" value="knees" /> Knees</label>
                     <label><input type="checkbox" name="injOptions" value="ankles" /> Ankles</label>
@@ -50,6 +51,7 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                     <label><input type="checkbox" name="rehOptions" value="shoulders" /> Shoulders</label>
                     <label><input type="checkbox" name="rehOptions" value="elbows" /> Elbows</label>
                     <label><input type="checkbox" name="rehOptions" value="wrists" /> Wrists</label>
+                    <label><input type="checkbox" name="injOptions" value="back" /> Lower Back</label>
                     <label><input type="checkbox" name="rehOptions" value="hips" /> Hips</label>
                     <label><input type="checkbox" name="rehOptions" value="knees" /> Knees</label>
                     <label><input type="checkbox" name="rehOptions" value="ankles" /> Ankles</label>
@@ -111,6 +113,7 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                 ))}
               </div>
               <div className="analysisWords">
+                {shoulderAdvice && <p>{shoulderAdvice}</p>}
               </div>
             </div>
           </section>

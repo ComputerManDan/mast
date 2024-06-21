@@ -2,6 +2,9 @@
 body {
   margin: 0;
 }
+p{
+  font-family: Arial, Helvetica, sans-serif;
+}
 header {
   grid-column: span 9;
   background-color: rgb(240, 240, 240);
