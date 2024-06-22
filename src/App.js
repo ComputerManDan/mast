@@ -14,22 +14,46 @@ function App() {
   const [isWebcamEnabled, setIsWebcamEnabled] = useState(false);
   const [forceVecResults, setForceVecResults] = useState([]);
   const [analysisMet, setAnalysisMet] = useState([]);
-  const [shoulderAdvice, setShoulderAdvice] = useState(''); // New state for shoulder advice
+  const [shoulderAdvice, setShoulderAdvice] = useState('');
+  const [elbowAdvice, setElbowAdvice] = useState('');
+  const [wristAdvice, setWristAdvice] = useState('');
 
-  const analyzeShoulderPosition = (leftWrist, rightWrist, leftShoulder, rightShoulder) => {
-    const leftWristToShoulder = leftWrist.y - leftShoulder.y;
-    const rightWristToShoulder = rightWrist.y - rightShoulder.y;
-  
+  const analyzeShoulderPosition = (combinedWristAngle, forwardLean) => {
     let advice = '';
-    if (leftWristToShoulder > -0.1 && rightWristToShoulder > -0.1) {
-      advice = 'Shoulder advice: Place the bar in the traps of the back.';
+    if (combinedWristAngle > -0.1) {
+      advice = `Shoulder advice: Place the bar on the traps of the back. Combined wrist to shoulder: ${combinedWristAngle.toFixed(2)}m.`;
     } else {
-      advice = 'Shoulder advice: Move the bar up or lean further forward with the squat.';
+      advice = `Shoulder advice: Move the bar up or lean further forward with the squat. Combined wrist to shoulder: ${combinedWristAngle.toFixed(2)}m. Leaning forward: ${forwardLean.toFixed(2)}m.`;
+    }
+
+    return advice;
+  };
+
+  const analyzeElbowPosition = (elbowToShoulderDistance, elbowToWristDistance) => {
+    let advice = '';
+    const ratio = elbowToWristDistance / elbowToShoulderDistance;
+    if (ratio < 1) {
+      advice = `Elbow advice: Your elbow position is good. Ratio: ${ratio.toFixed(2)} (Elbow to wrist distance: ${elbowToWristDistance.toFixed(2)}m, Elbow to shoulder distance: ${elbowToShoulderDistance.toFixed(2)}m).`;
+    } else {
+      advice = `Elbow advice: Your elbows are too far tucked forward. Ratio: ${ratio.toFixed(2)} (Elbow to wrist distance: ${elbowToWristDistance.toFixed(2)}m, Elbow to shoulder distance: ${elbowToShoulderDistance.toFixed(2)}m).`;
     }
   
     return advice;
-  };  
+  };
+
+  const analyzeWristPosition = (leftWristAngle, rightWristAngle) => {
+    let advice = '';
+    const combinedWristAngle = Math.abs(Math.min(leftWristAngle, rightWristAngle) - 140);
   
+    if (combinedWristAngle === 0) {
+      advice = `Wrist advice: Your wrists are properly stacked over the elbows. Combined wrist angle: ${combinedWristAngle.toFixed(2)} degrees.`;
+    } else {
+      advice = `Wrist advice: Your wrists need to be stacked over the elbows. Combined wrist angle: ${combinedWristAngle.toFixed(2)} degrees.`;
+    }
+  
+    return advice;
+  };
+
   const updateResultsCallback = useCallback((landmarks) => {
     updateResults(
       landmarks,
@@ -44,15 +68,27 @@ function App() {
       setAnalysisMet
     );
     // Shoulder analysis
-    const leftWrist = landmarks[15];
-    const rightWrist = landmarks[16];
-    const leftShoulder = landmarks[11];
-    const rightShoulder = landmarks[12];
-    
-    const advice = analyzeShoulderPosition(leftWrist, rightWrist, leftShoulder, rightShoulder);
-
-    // Set shoulder advice separately
-    setShoulderAdvice(advice);
+    const leftWristAngle = calculateAngle(landmarks[13], landmarks[15], landmarks[11]);
+    const rightWristAngle = calculateAngle(landmarks[14], landmarks[16], landmarks[12]);
+    const combinedShoulderAngle = (landmarks[11].y + landmarks[12].y) / 2;
+    const forwardLean = landmarks[23].y - landmarks[0].y;
+  
+    const leftElbowToShoulderDistance = calculateDistance(landmarks[13], landmarks[11]);
+    const leftElbowToWristDistance = calculateDistance(landmarks[13], landmarks[15]);
+    const rightElbowToShoulderDistance = calculateDistance(landmarks[14], landmarks[12]);
+    const rightElbowToWristDistance = calculateDistance(landmarks[14], landmarks[16]);
+  
+    const combinedElbowToShoulderDistance = (leftElbowToShoulderDistance + rightElbowToShoulderDistance) / 2;
+    const combinedElbowToWristDistance = (leftElbowToWristDistance + rightElbowToWristDistance) / 2;
+  
+    const shoulderAdvice = analyzeShoulderPosition(combinedShoulderAngle, combinedShoulderAngle, forwardLean);
+    const elbowAdvice = analyzeElbowPosition(combinedElbowToShoulderDistance, combinedElbowToWristDistance);
+    const wristAdvice = analyzeWristPosition(leftWristAngle, rightWristAngle);
+  
+    // Set shoulder, elbow, and wrist advice separately
+    setShoulderAdvice(shoulderAdvice);
+    setElbowAdvice(elbowAdvice);
+    setWristAdvice(wristAdvice);
   }, [calculateAngle, calculateForceVectors, setResults, bodyWeight, additionalWeight, weightUnit, setForceVecResults, setAnalysisMet, calculateDistance]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
@@ -83,7 +119,9 @@ function App() {
       results={results}
       forceVecResults={forceVecResults}
       analysisMet={analysisMet}
-      shoulderAdvice={shoulderAdvice} // Pass shoulder advice
+      shoulderAdvice={shoulderAdvice}
+      elbowAdvice={elbowAdvice}
+      wristAdvice={wristAdvice} // Pass wrist advice
     />
   );
 };

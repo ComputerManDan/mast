@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice }) => {
+const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice }) => {
   return (
     <div>
       {showSplash && (
@@ -114,6 +114,8 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
               </div>
               <div className="analysisWords">
                 {shoulderAdvice && <p>{shoulderAdvice}</p>}
+                {elbowAdvice && <p>{elbowAdvice}</p>}
+                {wristAdvice && <p>{wristAdvice}</p>}
               </div>
             </div>
           </section>
