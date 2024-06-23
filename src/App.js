@@ -17,6 +17,9 @@ function App() {
   const [shoulderAdvice, setShoulderAdvice] = useState('');
   const [elbowAdvice, setElbowAdvice] = useState('');
   const [wristAdvice, setWristAdvice] = useState('');
+  const [lowerBackAdvice, setLowerBackAdvice] = useState(''); // New state for lower back advice
+  const [hipAdvice, setHipAdvice] = useState(''); // New state for hip advice
+
 
   const analyzeShoulderPosition = (combinedWristAngle, forwardLean) => {
     let advice = '';
@@ -54,6 +57,30 @@ function App() {
     return advice;
   };
 
+  const analyzeHipFlexion = (hipAngle, kneeOverToeAngle, leanAngle) => {
+    let advice = `Hip advice: To reduce hip pressure:
+      \n- Move your feet closer together for increased knee over-toe translation.
+      \n- Move the bar higher up on your back to reduce the amount of lean required.`;
+  
+    advice += `\nCurrent hip angle: ${hipAngle.toFixed(2)} degrees`;
+    advice += `\nCurrent knee over-toe angle: ${kneeOverToeAngle.toFixed(2)} degrees`;
+    advice += `\nCurrent lean angle: ${leanAngle.toFixed(2)} degrees`;
+  
+    return advice;
+  };
+
+  const analyzeLowerBackStrain = (leanAngle, footWidth, ankleAngle) => {
+    let advice = `Lower back advice: To reduce strain:
+      \n- Position your feet more forward for increased knee over-toe translation.
+      \n- Move the bar up higher on your back to reduce the lean required to keep the bar over the center line of the lift.`;
+  
+    advice += `\nCurrent lean: ${leanAngle.toFixed(2)} degrees`;
+    advice += `\nFoot width: ${footWidth.toFixed(2)} meters`;
+    advice += `\nKnee over-toe transition (ankle angle): ${ankleAngle.toFixed(2)} degrees`;
+  
+    return advice;
+  };
+  
   const updateResultsCallback = useCallback((landmarks) => {
     updateResults(
       landmarks,
@@ -67,9 +94,22 @@ function App() {
       setForceVecResults,
       setAnalysisMet
     );
-    // Shoulder analysis
-    const leftWristAngle = calculateAngle(landmarks[13], landmarks[15], landmarks[11]);
-    const rightWristAngle = calculateAngle(landmarks[14], landmarks[16], landmarks[12]);
+    
+    // Calculate angles
+    const leanAngle = Math.abs(calculateAngle(landmarks[11], landmarks[23], landmarks[0])); // Angle between shoulder, hip, and nose
+    const footWidth = calculateDistance(landmarks[31], landmarks[32]); // Distance between left and right foot index
+    const leftAnkleAngle = calculateAngle(landmarks[25], landmarks[27], landmarks[31]);
+    const rightAnkleAngle = calculateAngle(landmarks[26], landmarks[28], landmarks[32]);
+    const combinedAnkleAngle = (leftAnkleAngle + rightAnkleAngle) / 2;
+    const leftHipAngle = calculateAngle(landmarks[11], landmarks[23], landmarks[25]);
+    const rightHipAngle = calculateAngle(landmarks[12], landmarks[24], landmarks[26]);
+    const combinedHipAngle = (leftHipAngle + rightHipAngle) / 2;
+  
+    // Lower back analysis
+    const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
+  
+    // Shoulder, elbow, and wrist analysis (existing)
+    const combinedWristAngle = (landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2;
     const combinedShoulderAngle = (landmarks[11].y + landmarks[12].y) / 2;
     const forwardLean = landmarks[23].y - landmarks[0].y;
   
@@ -78,17 +118,25 @@ function App() {
     const rightElbowToShoulderDistance = calculateDistance(landmarks[14], landmarks[12]);
     const rightElbowToWristDistance = calculateDistance(landmarks[14], landmarks[16]);
   
+    const leftWristAngle = calculateAngle(landmarks[11], landmarks[13], landmarks[15]);
+    const rightWristAngle = calculateAngle(landmarks[12], landmarks[14], landmarks[16]);
+
     const combinedElbowToShoulderDistance = (leftElbowToShoulderDistance + rightElbowToShoulderDistance) / 2;
     const combinedElbowToWristDistance = (leftElbowToWristDistance + rightElbowToWristDistance) / 2;
   
-    const shoulderAdvice = analyzeShoulderPosition(combinedShoulderAngle, combinedShoulderAngle, forwardLean);
+    const shoulderAdvice = analyzeShoulderPosition(combinedWristAngle, combinedShoulderAngle, forwardLean);
     const elbowAdvice = analyzeElbowPosition(combinedElbowToShoulderDistance, combinedElbowToWristDistance);
     const wristAdvice = analyzeWristPosition(leftWristAngle, rightWristAngle);
   
-    // Set shoulder, elbow, and wrist advice separately
+    // Hip analysis
+    const hipAdvice = analyzeHipFlexion(combinedHipAngle, combinedAnkleAngle, leanAngle);
+  
+    // Set shoulder, elbow, wrist, lower back, and hip advice separately
     setShoulderAdvice(shoulderAdvice);
     setElbowAdvice(elbowAdvice);
     setWristAdvice(wristAdvice);
+    setLowerBackAdvice(lowerBackAdvice);
+    setHipAdvice(hipAdvice);
   }, [calculateAngle, calculateForceVectors, setResults, bodyWeight, additionalWeight, weightUnit, setForceVecResults, setAnalysisMet, calculateDistance]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
@@ -122,6 +170,8 @@ function App() {
       shoulderAdvice={shoulderAdvice}
       elbowAdvice={elbowAdvice}
       wristAdvice={wristAdvice} // Pass wrist advice
+      lowerBackAdvice={lowerBackAdvice} // Pass lower back advice
+      hipAdvice={hipAdvice} // Pass hip advice
     />
   );
 };
