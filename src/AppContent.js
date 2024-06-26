@@ -1,16 +1,16 @@
 import React from 'react';
 
-const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice, ankleAdvice, handleCheckboxChange, selectedInjuries}) => {
+const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice, ankleAdvice, handleCheckboxChange, selectedInjuries, handleEnablePredictions, rehShoulderAdvice, rehElbowAdvice, rehWristAdvice, rehLowerBackAdvice, rehHipAdvice, rehKneeAdvice, rehAnkleAdvice, selectedRehabInjuries}) => {
   return (
     <div>
       {showSplash && (
         <div className="splash-screen" onClick={() => setShowSplash(false)}>
-        <div className="splash-content">
-          <img src="exeter.jpg" alt="Exeter University Background" id="splash-uni"/>
-          <img src="logomast.png" alt="Splash Background" className="splash-image" />
-          <h2 className="splash-text">Tap to Continue</h2>
+          <div className="splash-content">
+            <img src="exeter.jpg" alt="Exeter University Background" id="splash-uni"/>
+            <img src="logomast.png" alt="Splash Background" className="splash-image" />
+            <h2 className="splash-text">Tap to Continue</h2>
+          </div>
         </div>
-      </div>
       )}
       {!showSplash && (
         <div className="wrapper">
@@ -24,10 +24,10 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                     <span className="mdc-button__label">Athletic performance</span>
                 </button>
                 <div className="dropdown-content">
-                    <label><input type="radio" name="injOptions" value="shoulders" /> Max Lift</label>
-                    <label><input type="radio" name="injOptions" value="elbows" />Quadriceps Bias</label>
-                    <label><input type="radio" name="injOptions" value="wrists" />Posterior chain Bias</label>
-                </div>
+                <label><input type="radio" name="injOptions" value="lift" onChange={handleCheckboxChange} /> Max Lift</label>
+                <label><input type="radio" name="injOptions" value="quad" onChange={handleCheckboxChange} /> Quadriceps Bias</label>
+                <label><input type="radio" name="injOptions" value="post" onChange={handleCheckboxChange} /> Posterior chain Bias</label>
+              </div>
                 </div>
                 <div className="dropdown">
                 <button id="injButton" className="mdc-button mdc-button--raised dropdown-toggle">
@@ -48,21 +48,21 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                     <span className="mdc-button__label">Injury Rehabilitation</span>
                 </button>
                 <div className="dropdown-content">
-                    <label><input type="checkbox" name="rehOptions" value="shoulders" /> Shoulders</label>
-                    <label><input type="checkbox" name="rehOptions" value="elbows" /> Elbows</label>
-                    <label><input type="checkbox" name="rehOptions" value="wrists" /> Wrists</label>
-                    <label><input type="checkbox" name="injOptions" value="back" /> Lower Back</label>
-                    <label><input type="checkbox" name="rehOptions" value="hips" /> Hips</label>
-                    <label><input type="checkbox" name="rehOptions" value="knees" /> Knees</label>
-                    <label><input type="checkbox" name="rehOptions" value="ankles" /> Ankles</label>
+                <label><input type="checkbox" name="rehOptions" value="shoulders" onChange={handleCheckboxChange} /> Shoulders</label>
+  <label><input type="checkbox" name="rehOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
+  <label><input type="checkbox" name="rehOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
+  <label><input type="checkbox" name="rehOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
+  <label><input type="checkbox" name="rehOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
+  <label><input type="checkbox" name="rehOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
+  <label><input type="checkbox" name="rehOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
                 </div>
                 </div>
             </div>
             </section>
-          <main id="demos" className="invisible">
-            <button id="webcamButton" className="mdc-button mdc-button--raised" onClick={() => setIsWebcamEnabled(true)}>
+            <main id="demos" className="invisible">
+            <button id="webcamButton" className="mdc-button mdc-button--raised" onClick={() => handleEnablePredictions(!isWebcamEnabled)}>
               <span className="mdc-button__ripple"></span>
-              <span className="mdc-button__label">ENABLE WEBCAM</span>
+              <span className="mdc-button__label">{isWebcamEnabled ? 'STOP' : 'ENABLE WEBCAM'}</span>
             </button>
             <div id="weights">
               <label className="weightLabel">
@@ -96,21 +96,59 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
           </main>
           <section>
             <h2>Results</h2>
-            <div className="results">
-              <div className="angles">
+            <div className="angles">
+              <h3>Angles</h3>
                 {results.map((result, index) => (
                   <p key={index}>{result}</p>
                 ))}
               </div>
+            <div className="results">
               <div className="forceVec">
+              <h3>Loads at joints</h3>
                 {forceVecResults.map((result, index) => (
                   <p key={index}>{result}</p>
                 ))}
-                {analysisMet.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
               </div>
-              <div className="analysisWords">
+              <div className="analysisMet">
+                <h3>Performance</h3>
+                {selectedInjuries.includes("lift") && <p>Hello</p>}
+
+                {selectedInjuries.includes("quad") && (
+                  <>
+                    <p>To increase these have more knee flexton:</p>
+                    {analysisMet.filter(result =>
+                      result.includes("Quadriceps Force") || result.includes("Knee Torque")
+                    ).map((result, index) => (
+                      <p key={index}>{result}</p>
+                    ))}
+                    <p>This should result in a decrease of hip flextion and likley less forward lean:</p>
+                    {analysisMet.filter(result =>
+                      result.includes("Hamstrings Force") || result.includes("Gluteus Maximus Force") || result.includes("Hip Torque")
+                    ).map((result, index) => (
+                      <p key={index}>{result}</p>
+                    ))}
+                  </>
+                )}
+
+                {selectedInjuries.includes("post") && (
+                  <>
+                    <p>To increase these have more hip flextion and forward lean to compensate if needed:</p>
+                    {analysisMet.filter(result =>
+                      result.includes("Hamstrings Force") || result.includes("Gluteus Maximus Force") || result.includes("Hip Torque")
+                    ).map((result, index) => (
+                      <p key={index}>{result}</p>
+                    ))}
+                    <p> This will result in less knee flexton and decrease these:</p>
+                    {analysisMet.filter(result =>
+                      result.includes("Quadriceps Force") || result.includes("Knee Torque")
+                    ).map((result, index) => (
+                      <p key={index}>{result}</p>
+                    ))}
+                  </>
+                )}
+              </div>
+
+              <div className="InjPrev">
                 <h3>Injury Prevention</h3>
                 {selectedInjuries.includes("shoulders") && shoulderAdvice && <p>{shoulderAdvice}</p>}
                 {selectedInjuries.includes("elbows") && elbowAdvice && <p>{elbowAdvice}</p>}
@@ -119,9 +157,16 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                 {selectedInjuries.includes("hips") && hipAdvice && <p>{hipAdvice}</p>}
                 {selectedInjuries.includes("knees") && kneeAdvice && <p>{kneeAdvice}</p>}
                 {selectedInjuries.includes("ankles") && ankleAdvice && <p>{ankleAdvice}</p>}
-                <h3>Injury Rehabilitation</h3>
               </div>
-              <div className="analysisMet">
+              <div className="InjReh">
+              <h3>Injury Rehabilitation</h3>
+              {selectedRehabInjuries.includes("shoulders") && rehShoulderAdvice && <p>{rehShoulderAdvice}</p>}
+              {selectedRehabInjuries.includes("elbows") && rehElbowAdvice && <p>{rehElbowAdvice}</p>}
+              {selectedRehabInjuries.includes("wrists") && rehWristAdvice && <p>{rehWristAdvice}</p>}
+              {selectedRehabInjuries.includes("back") && rehLowerBackAdvice && <p>{rehLowerBackAdvice}</p>}
+              {selectedRehabInjuries.includes("hips") && rehHipAdvice && <p>{rehHipAdvice}</p>}
+              {selectedRehabInjuries.includes("knees") && rehKneeAdvice && <p>{rehKneeAdvice}</p>}
+              {selectedRehabInjuries.includes("ankles") && rehAnkleAdvice && <p>{rehAnkleAdvice}</p>}
               </div>
             </div>
           </section>

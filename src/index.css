@@ -238,8 +238,14 @@ video {
 .weightLabel{padding-right: 1em;}
 .results {
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
   gap: 1em; /* Optional: Add space between the divs */
+}
+
+.results > div {
+  flex: 1;
+  padding: 10px; /* Optional: to add some spacing around each div */
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
 
 .angles, .forceVec, .analysisMet, .analysisWords {
