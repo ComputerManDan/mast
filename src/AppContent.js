@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice}) => {
+const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice, ankleAdvice, handleCheckboxChange, selectedInjuries}) => {
   return (
     <div>
       {showSplash && (
@@ -34,13 +34,13 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                     <span className="mdc-button__label">Injury prevention</span>
                 </button>
                 <div className="dropdown-content">
-                    <label><input type="checkbox" name="injOptions" value="shoulders" /> Shoulders</label>
-                    <label><input type="checkbox" name="injOptions" value="elbows" /> Elbows</label>
-                    <label><input type="checkbox" name="injOptions" value="wrists" /> Wrists</label>
-                    <label><input type="checkbox" name="injOptions" value="back" /> Lower Back</label>
-                    <label><input type="checkbox" name="injOptions" value="hips" /> Hips</label>
-                    <label><input type="checkbox" name="injOptions" value="knees" /> Knees</label>
-                    <label><input type="checkbox" name="injOptions" value="ankles" /> Ankles</label>
+                  <label><input type="checkbox" name="injOptions" value="shoulders" onChange={handleCheckboxChange} /> Shoulders</label>
+                  <label><input type="checkbox" name="injOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
+                  <label><input type="checkbox" name="injOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
+                  <label><input type="checkbox" name="injOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
+                  <label><input type="checkbox" name="injOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
+                  <label><input type="checkbox" name="injOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
+                  <label><input type="checkbox" name="injOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
                 </div>
                 </div>
                 <div className="dropdown">
@@ -106,20 +106,22 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                 {forceVecResults.map((result, index) => (
                   <p key={index}>{result}</p>
                 ))}
-              </div>
-              <div className="analysisMet">
                 {analysisMet.map((result, index) => (
                   <p key={index}>{result}</p>
                 ))}
               </div>
               <div className="analysisWords">
                 <h3>Injury Prevention</h3>
-                {shoulderAdvice && <p>{shoulderAdvice}</p>}
-                {elbowAdvice && <p>{elbowAdvice}</p>}
-                {wristAdvice && <p>{wristAdvice}</p>}
-                {lowerBackAdvice && <p>{lowerBackAdvice}</p>}
-                {hipAdvice && <p>{hipAdvice}</p>}
+                {selectedInjuries.includes("shoulders") && shoulderAdvice && <p>{shoulderAdvice}</p>}
+                {selectedInjuries.includes("elbows") && elbowAdvice && <p>{elbowAdvice}</p>}
+                {selectedInjuries.includes("wrists") && wristAdvice && <p>{wristAdvice}</p>}
+                {selectedInjuries.includes("back") && lowerBackAdvice && <p>{lowerBackAdvice}</p>}
+                {selectedInjuries.includes("hips") && hipAdvice && <p>{hipAdvice}</p>}
+                {selectedInjuries.includes("knees") && kneeAdvice && <p>{kneeAdvice}</p>}
+                {selectedInjuries.includes("ankles") && ankleAdvice && <p>{ankleAdvice}</p>}
                 <h3>Injury Rehabilitation</h3>
+              </div>
+              <div className="analysisMet">
               </div>
             </div>
           </section>

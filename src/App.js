@@ -19,7 +19,18 @@ function App() {
   const [wristAdvice, setWristAdvice] = useState('');
   const [lowerBackAdvice, setLowerBackAdvice] = useState(''); // New state for lower back advice
   const [hipAdvice, setHipAdvice] = useState(''); // New state for hip advice
+  const [kneeAdvice, setKneeAdvice] = useState('');
+  const [ankleAdvice, setAnkleAdvice] = useState('');
+  const [selectedInjuries, setSelectedInjuries] = useState([]);
 
+  const handleCheckboxChange = (event) => {
+    const value = event.target.value;
+    setSelectedInjuries((prevSelectedInjuries) =>
+      prevSelectedInjuries.includes(value)
+        ? prevSelectedInjuries.filter((inj) => inj !== value)
+        : [...prevSelectedInjuries, value]
+    );
+  };
 
   const analyzeShoulderPosition = (combinedWristAngle, forwardLean) => {
     let advice = '';
@@ -80,6 +91,29 @@ function App() {
   
     return advice;
   };
+
+  const analyzeKneePosition = (kneeAngle) => {
+    // Placeholder analysis logic for knees
+    let advice = '';
+    if (kneeAngle > 90) {
+      advice = `Knee advice: Your knee angle is too large. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
+    } else {
+      advice = `Knee advice: Your knee angle is appropriate. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
+    }
+    return advice;
+  };
+  
+  const analyzeAnklePosition = (ankleAngle) => {
+    // Placeholder analysis logic for ankles
+    let advice = '';
+    if (ankleAngle > 45) {
+      advice = `Ankle advice: Your ankle angle is too large. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
+    } else {
+      advice = `Ankle advice: Your ankle angle is appropriate. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
+    }
+    return advice;
+  };
+  
   
   const updateResultsCallback = useCallback((landmarks) => {
     updateResults(
@@ -104,7 +138,8 @@ function App() {
     const leftHipAngle = calculateAngle(landmarks[11], landmarks[23], landmarks[25]);
     const rightHipAngle = calculateAngle(landmarks[12], landmarks[24], landmarks[26]);
     const combinedHipAngle = (leftHipAngle + rightHipAngle) / 2;
-  
+    const kneeAngle = (calculateAngle(landmarks[23], landmarks[25], landmarks[27]) + calculateAngle(landmarks[24], landmarks[26], landmarks[28])) / 2;
+
     // Lower back analysis
     const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
   
@@ -127,16 +162,18 @@ function App() {
     const shoulderAdvice = analyzeShoulderPosition(combinedWristAngle, combinedShoulderAngle, forwardLean);
     const elbowAdvice = analyzeElbowPosition(combinedElbowToShoulderDistance, combinedElbowToWristDistance);
     const wristAdvice = analyzeWristPosition(leftWristAngle, rightWristAngle);
-  
-    // Hip analysis
     const hipAdvice = analyzeHipFlexion(combinedHipAngle, combinedAnkleAngle, leanAngle);
-  
+    const kneeAdvice = analyzeKneePosition(kneeAngle);
+    const ankleAdvice = analyzeAnklePosition(combinedAnkleAngle);
+
     // Set shoulder, elbow, wrist, lower back, and hip advice separately
     setShoulderAdvice(shoulderAdvice);
     setElbowAdvice(elbowAdvice);
     setWristAdvice(wristAdvice);
     setLowerBackAdvice(lowerBackAdvice);
     setHipAdvice(hipAdvice);
+    setKneeAdvice(kneeAdvice);
+    setAnkleAdvice(ankleAdvice);
   }, [calculateAngle, calculateForceVectors, setResults, bodyWeight, additionalWeight, weightUnit, setForceVecResults, setAnalysisMet, calculateDistance]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
@@ -172,6 +209,10 @@ function App() {
       wristAdvice={wristAdvice} // Pass wrist advice
       lowerBackAdvice={lowerBackAdvice} // Pass lower back advice
       hipAdvice={hipAdvice} // Pass hip advice
+      kneeAdvice={kneeAdvice} // Pass knee advice
+      ankleAdvice={ankleAdvice} // Pass ankle advice
+      handleCheckboxChange={handleCheckboxChange} // Pass the handler to AppContent
+      selectedInjuries={selectedInjuries}
     />
   );
 };
