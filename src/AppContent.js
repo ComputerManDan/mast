@@ -1,5 +1,4 @@
 import React from 'react';
-
 const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight, weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults, analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice, ankleAdvice, handleCheckboxChange, selectedInjuries, handleEnablePredictions, rehShoulderAdvice, rehElbowAdvice, rehWristAdvice, rehLowerBackAdvice, rehHipAdvice, rehKneeAdvice, rehAnkleAdvice, selectedRehabInjuries}) => {
   return (
     <div>
@@ -49,12 +48,12 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
                 </button>
                 <div className="dropdown-content">
                 <label><input type="checkbox" name="rehOptions" value="shoulders" onChange={handleCheckboxChange} /> Shoulders</label>
-  <label><input type="checkbox" name="rehOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
-  <label><input type="checkbox" name="rehOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
-  <label><input type="checkbox" name="rehOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
-  <label><input type="checkbox" name="rehOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
-  <label><input type="checkbox" name="rehOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
-  <label><input type="checkbox" name="rehOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
+                <label><input type="checkbox" name="rehOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
+                <label><input type="checkbox" name="rehOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
+                <label><input type="checkbox" name="rehOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
+                <label><input type="checkbox" name="rehOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
+                <label><input type="checkbox" name="rehOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
+                <label><input type="checkbox" name="rehOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
                 </div>
                 </div>
             </div>
@@ -96,19 +95,24 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
           </main>
           <section>
             <h2>Results</h2>
-            <div className="angles">
-              <h3>Angles</h3>
-                {results.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
             <div className="results">
+              <div className="angles">
+                <h3>Angles</h3>
+                  {results.map((result, index) => (
+                    <p key={index}>{result}</p>
+                  ))}
+              </div>
+              <div className="peaks">
+                <h3>Peaks & Reps</h3>
+              </div>
               <div className="forceVec">
               <h3>Loads at joints</h3>
                 {forceVecResults.map((result, index) => (
                   <p key={index}>{result}</p>
                 ))}
               </div>
+            </div>
+            <div className="results">
               <div className="analysisMet">
                 <h3>Performance</h3>
                 {selectedInjuries.includes("lift") && <p>Hello</p>}
@@ -178,5 +182,4 @@ const AppContent = ({ showSplash, setShowSplash, bodyWeight, setBodyWeight, addi
     </div>
   );
 };
-
 export default AppContent;

@@ -63,9 +63,9 @@ const analyzeLowerBackStrain = (leanAngle, footWidth, ankleAngle) => {
 const analyzeKneePosition = (kneeAngle) => {
     let advice = '';
     if (kneeAngle > 90) {
-        advice = `Knee advice: Your knee angle is too large. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
+        advice = `To reduce pressure on your ankle load more in to the hips (to reduce knee over toe translation), Knee advice: Your knee angle is appropriate. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
     } else {
-        advice = `Knee advice: Your knee angle is appropriate. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
+        advice = `To reduce pressure on knee load more in to the hips (to reduce knee over toe translation), Knee advice: Your knee angle is too large, high pressure. Current angle: ${kneeAngle.toFixed(2)} degrees.`;
     }
     return advice;
 };
@@ -73,9 +73,9 @@ const analyzeKneePosition = (kneeAngle) => {
 const analyzeAnklePosition = (ankleAngle) => {
     let advice = '';
     if (ankleAngle > 45) {
-        advice = `Ankle advice: Your ankle angle is too large. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
+        advice = `To reduce pressure on your ankle load more in to the hips (to reduce knee over toe translation), Ankle advice: Your ankle angle is appropriate. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
     } else {
-        advice = `Ankle advice: Your ankle angle is appropriate. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
+        advice = `To reduce pressure on your ankle load more in to the hips (to reduce knee over toe translation), Ankle advice: Your ankle angle is too large leading to high pressure. Current angle: ${ankleAngle.toFixed(2)} degrees.`;
     }
     return advice;
 };

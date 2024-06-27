@@ -248,7 +248,7 @@ video {
   box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
 
-.angles, .forceVec, .analysisMet, .analysisWords {
+.angles, .forceVec, .analysisMet, .analysisWords, .peaks, .InjPrev, .InjReh {
   flex: 1; /* Make all divs take equal space */
   text-align: center;
 }
