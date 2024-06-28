@@ -36,7 +36,11 @@ function App() {
   const handleCheckboxChange = (event) => {
     const { name, value } = event.target;
     if (name === 'injOptions') {
-      setSelectedInjuries([value]);
+      setSelectedInjuries((prevSelectedInjuries) =>
+        prevSelectedInjuries.includes(value)
+          ? prevSelectedInjuries.filter((inj) => inj !== value)
+          : [...prevSelectedInjuries, value]
+      );
     } else if (name === 'rehOptions') {
       setSelectedRehabInjuries((prevSelectedRehabInjuries) =>
         prevSelectedRehabInjuries.includes(value)
@@ -45,7 +49,6 @@ function App() {
       );
     }
   };
-  
 
   const handleEnablePredictions = () => {
     setIsWebcamEnabled(true);
@@ -177,4 +180,5 @@ function App() {
     />
   );
 }
+
 export default App;
