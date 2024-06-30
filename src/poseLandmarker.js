@@ -50,7 +50,7 @@ export const loadPoseLandmarker = async (setIsWebcamEnabled, setLoading, display
         }
   
         poseLandmarker.detect(event.target, (result) => {
-          console.log("Detection result:", result);
+          // console.log("Detection result:", result);
           const canvas = document.createElement("canvas");
           canvas.setAttribute("className", "canvas");
           canvas.setAttribute("width", event.target.naturalWidth + "px");
@@ -136,7 +136,7 @@ export const loadPoseLandmarker = async (setIsWebcamEnabled, setLoading, display
           if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
             poseLandmarker.detectForVideo(video, startTimeMs, (result) => {
-              console.log("Video detection result:", result);
+              // console.log("Video detection result:", result);
               canvasCtx.save();
               canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
               for (const landmark of result.landmarks) {

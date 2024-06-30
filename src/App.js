@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { loadPoseLandmarker } from "./poseLandmarker";
 import AppContent from './AppContent';
@@ -32,6 +32,8 @@ function App() {
   const [rehKneeAdvice, setRehKneeAdvice] = useState('');
   const [rehAnkleAdvice, setRehAnkleAdvice] = useState([]);
   const [selectedRehabInjuries, setSelectedRehabInjuries] = useState([]);
+  const [repCount, setRepCount] = useState(0);
+  const isSquattingRef = useRef(false);
 
   const handleCheckboxChange = (event) => {
     const { name, value } = event.target;
@@ -78,6 +80,16 @@ function App() {
     const rightHipAngle = calculateAngle(landmarks[12], landmarks[24], landmarks[26]);
     const combinedHipAngle = (leftHipAngle + rightHipAngle) / 2;
     const kneeAngle = (calculateAngle(landmarks[23], landmarks[25], landmarks[27]) + calculateAngle(landmarks[24], landmarks[26], landmarks[28])) / 2;
+
+    if (!isSquattingRef.current && kneeAngle > 50) {
+      isSquattingRef.current = true;
+      console.log(`Setting isSquatting to true, kneeAngle: ${kneeAngle}`);
+    } else if (isSquattingRef.current && kneeAngle < 30) {
+      setRepCount((prevRepCount) => prevRepCount + 1);
+      isSquattingRef.current = false;
+      console.log(`Incrementing rep count, new rep count: ${repCount + 1}`);
+    }
+
 
     // Lower back analysis
     const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
@@ -130,7 +142,19 @@ function App() {
     setRehHipAdvice(rehHipAdvice);
     setRehKneeAdvice(rehKneeAdvice);
     setRehAnkleAdvice(rehAnkleAdvice);
-  }, [calculateAngle, calculateForceVectors, setResults, bodyWeight, additionalWeight, weightUnit, setForceVecResults, setAnalysisMet, calculateDistance]);
+
+  }, [
+    calculateAngle,
+    calculateForceVectors,
+    setResults,
+    bodyWeight,
+    additionalWeight,
+    weightUnit,
+    setForceVecResults,
+    setAnalysisMet,
+    calculateDistance,
+    repCount,
+  ]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
     displayResults(landmarksArray, updateResultsCallback, setResults);
@@ -169,14 +193,15 @@ function App() {
       handleCheckboxChange={handleCheckboxChange}
       selectedInjuries={selectedInjuries}
       handleEnablePredictions={handleEnablePredictions}
-      selectedRehabInjuries={selectedRehabInjuries} // Pass selected rehab injuries
-      rehShoulderAdvice={rehShoulderAdvice} // Pass shoulder rehab advice
-      rehElbowAdvice={rehElbowAdvice} // Pass elbow rehab advice
-      rehWristAdvice={rehWristAdvice} // Pass wrist rehab advice
-      rehLowerBackAdvice={rehLowerBackAdvice} // Pass lower back rehab advice
-      rehHipAdvice={rehHipAdvice} // Pass hip rehab advice
-      rehKneeAdvice={rehKneeAdvice} // Pass knee rehab advice
-      rehAnkleAdvice={rehAnkleAdvice} // Pass ankle rehab advice
+      selectedRehabInjuries={selectedRehabInjuries}
+      rehShoulderAdvice={rehShoulderAdvice}
+      rehElbowAdvice={rehElbowAdvice}
+      rehWristAdvice={rehWristAdvice}
+      rehLowerBackAdvice={rehLowerBackAdvice}
+      rehHipAdvice={rehHipAdvice}
+      rehKneeAdvice={rehKneeAdvice}
+      rehAnkleAdvice={rehAnkleAdvice}
+      repCount={repCount}
     />
   );
 }
