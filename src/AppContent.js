@@ -132,6 +132,21 @@ const AppContent = ({
             <div className="results">
               <div className="analysisMet">
                 <h3>Performance</h3>
+                {selectedInjuries.includes("lift") && (
+                  <div>
+                    <label>
+                      Desired Knee Angle:
+                      <input type="number" value={desiredKneeAngle} onChange={(e) => setDesiredKneeAngle(e.target.value)} />
+                    </label>
+                    <label>
+                      Desired Ankle Flexibility Angle:
+                      <input type="number" value={desiredAnkleAngle} onChange={(e) => setDesiredAnkleAngle(e.target.value)} />
+                    </label>
+                    <p>Hip Angle (θ_h): {calculateSquatAngles(1.125, 1.25, desiredKneeAngle, desiredAnkleAngle).hipAngle.toFixed(2)}</p>
+                    <p>Back Angle (θ_b): {calculateSquatAngles(1.125, 1.25, desiredKneeAngle, desiredAnkleAngle).backAngle.toFixed(2)}</p>
+                  </div>
+                )}
+
                 {selectedInjuries.includes("quad") && (
                   <>
                     <p>To increase these have more knee flexion:</p>

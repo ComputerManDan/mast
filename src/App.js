@@ -9,6 +9,9 @@ import { analyzeShoulderPosition, analyzeElbowPosition, analyzeWristPosition, an
 import { analyzeShoulderRehab, analyzeElbowRehab, analyzeWristRehab, analyzeHipRehab, analyzeLowerBackRehab, analyzeKneeRehab, analyzeAnkleRehab } from './analyzeRehabPositions';
 
 const calculateSquatAngles = (landmarks, theta_k, theta_a) => {
+  if (!landmarks || landmarks.length < 33) {
+    return { hipAngle: 0, backAngle: 0 };
+  }
 
   const hip = landmarks[23];
   const knee = landmarks[25];
