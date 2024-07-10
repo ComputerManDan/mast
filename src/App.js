@@ -1,3 +1,5 @@
+// App.js
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { loadPoseLandmarker } from "./poseLandmarker";
@@ -5,6 +7,45 @@ import AppContent from './AppContent';
 import { calculateAngle, calculateDistance, calculateForceVectors, updateResults, displayResults } from './calculations';
 import { analyzeShoulderPosition, analyzeElbowPosition, analyzeWristPosition, analyzeHipFlexion, analyzeLowerBackStrain, analyzeKneePosition, analyzeAnklePosition } from './analyzePositions';
 import { analyzeShoulderRehab, analyzeElbowRehab, analyzeWristRehab, analyzeHipRehab, analyzeLowerBackRehab, analyzeKneeRehab, analyzeAnkleRehab } from './analyzeRehabPositions';
+
+const calculateSquatAngles = (landmarks, theta_k, theta_a) => {
+
+  const hip = landmarks[23];
+  const knee = landmarks[25];
+  const ankle = landmarks[27];
+  const shoulder = landmarks[11];
+
+  if (!hip || !knee || !ankle || !shoulder) {
+    return { hipAngle: 0, backAngle: 0 };
+  }
+
+  // Calculate the lengths of femur and tibia
+  const femurLength = calculateDistance(hip, knee);
+  const tibiaLength = calculateDistance(knee, ankle);
+
+  const R_f = femurLength / tibiaLength;
+  const torsoLength = calculateDistance(hip, shoulder);
+  const R_t = torsoLength / tibiaLength;
+
+  // Convert angles from degrees to radians for calculation
+  let theta_k_rad = theta_k * (Math.PI / 180);
+  let theta_a_rad = theta_a * (Math.PI / 180);
+
+  // Calculate Hip Angle (θ_h)
+  let cos_theta_h = (Math.cos(theta_k_rad) - R_f * Math.sin(theta_k_rad + theta_a_rad)) / Math.sqrt(1 + R_f ** 2);
+  let theta_h = Math.acos(cos_theta_h);
+  theta_h = theta_h * (180 / Math.PI); // Convert radians to degrees
+
+  // Calculate Back Angle (θ_b)
+  let theta_h_rad = theta_h * (Math.PI / 180); // Convert degrees to radians for sin function
+  let theta_b = Math.atan((R_f * Math.sin(theta_h_rad)) / R_t);
+  theta_b = theta_b * (180 / Math.PI); // Convert radians to degrees
+
+  return {
+    hipAngle: theta_h,
+    backAngle: theta_b,
+  };
+};
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -26,14 +67,21 @@ function App() {
   const [selectedInjuries, setSelectedInjuries] = useState([]);
   const [rehShoulderAdvice, setRehShoulderAdvice] = useState('');
   const [rehElbowAdvice, setRehElbowAdvice] = useState('');
-  const [rehWristAdvice, setRehWristAdvice] = useState('');
+  const [rehWristAdvice, setRehWristAdvice] = useState(''); 
   const [rehLowerBackAdvice, setRehLowerBackAdvice] = useState(''); 
   const [rehHipAdvice, setRehHipAdvice] = useState(''); 
   const [rehKneeAdvice, setRehKneeAdvice] = useState('');
   const [rehAnkleAdvice, setRehAnkleAdvice] = useState([]);
   const [selectedRehabInjuries, setSelectedRehabInjuries] = useState([]);
   const [repCount, setRepCount] = useState(0);
+  const [repPeaks, setRepPeaks] = useState([]);
   const isSquattingRef = useRef(false);
+  const currentPeakKneeAngleRef = useRef(0);
+  const currentPeakHipAngleRef = useRef(0);
+  const currentPeakLowerBackAngleRef = useRef(0);
+
+  const [desiredKneeAngle, setDesiredKneeAngle] = useState(90); // User input for desired knee angle
+  const [desiredAnkleAngle, setDesiredAnkleAngle] = useState(20); // User input for desired ankle flexibility angle
 
   const handleCheckboxChange = (event) => {
     const { name, value } = event.target;
@@ -83,13 +131,31 @@ function App() {
 
     if (!isSquattingRef.current && kneeAngle > 50) {
       isSquattingRef.current = true;
-      console.log(`Setting isSquatting to true, kneeAngle: ${kneeAngle}`);
+      currentPeakKneeAngleRef.current = 0;
+      currentPeakHipAngleRef.current = 0;
+      currentPeakLowerBackAngleRef.current = 0;
     } else if (isSquattingRef.current && kneeAngle < 30) {
-      setRepCount((prevRepCount) => prevRepCount + 1);
+      setRepCount((prevRepCount) => {
+        const newRepCount = prevRepCount + 1;
+        setRepPeaks((prevPeaks) => [
+          ...prevPeaks,
+          {
+            rep: newRepCount,
+            kneeAngle: currentPeakKneeAngleRef.current,
+            hipAngle: currentPeakHipAngleRef.current,
+            lowerBackAngle: currentPeakLowerBackAngleRef.current
+          }
+        ]);
+        return newRepCount;
+      });
       isSquattingRef.current = false;
-      console.log(`Incrementing rep count, new rep count: ${repCount + 1}`);
     }
 
+    if (isSquattingRef.current) {
+      currentPeakKneeAngleRef.current = Math.max(currentPeakKneeAngleRef.current, kneeAngle);
+      currentPeakHipAngleRef.current = Math.max(currentPeakHipAngleRef.current, combinedHipAngle);
+      currentPeakLowerBackAngleRef.current = Math.max(currentPeakLowerBackAngleRef.current, leanAngle);
+    }
 
     // Lower back analysis
     const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
@@ -144,16 +210,12 @@ function App() {
     setRehAnkleAdvice(rehAnkleAdvice);
 
   }, [
-    calculateAngle,
-    calculateForceVectors,
-    setResults,
     bodyWeight,
     additionalWeight,
     weightUnit,
     setForceVecResults,
     setAnalysisMet,
-    calculateDistance,
-    repCount,
+    setResults,
   ]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
@@ -202,6 +264,12 @@ function App() {
       rehKneeAdvice={rehKneeAdvice}
       rehAnkleAdvice={rehAnkleAdvice}
       repCount={repCount}
+      repPeaks={repPeaks}
+      desiredKneeAngle={desiredKneeAngle}
+      setDesiredKneeAngle={setDesiredKneeAngle}
+      desiredAnkleAngle={desiredAnkleAngle}
+      setDesiredAnkleAngle={setDesiredAnkleAngle}
+      calculateSquatAngles={calculateSquatAngles}
     />
   );
 }

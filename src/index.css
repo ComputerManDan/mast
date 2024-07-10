@@ -1,6 +1,8 @@
 /*--------------------Content tags--------------------*/
 body {
+  font-family: Arial, sans-serif;
   margin: 0;
+  padding: 0;
 }
 p{
   font-family: Arial, Helvetica, sans-serif;
@@ -251,6 +253,10 @@ video {
 .angles, .forceVec, .analysisMet, .analysisWords, .peaks, .InjPrev, .InjReh {
   flex: 1; /* Make all divs take equal space */
   text-align: center;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
 }
 /*--------------------Id Tags--------------------*/
 #splash-uni {
@@ -266,11 +272,17 @@ video {
   justify-content: center;
 }
 
-#video{
+#video {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
+}
+
+#video img,
+#video video,
+#video canvas {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 #webcam {
   width: 1280px;
