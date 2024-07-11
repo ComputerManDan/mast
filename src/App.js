@@ -1,5 +1,3 @@
-// App.js
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { loadPoseLandmarker } from "./poseLandmarker";
@@ -7,48 +5,7 @@ import AppContent from './AppContent';
 import { calculateAngle, calculateDistance, calculateForceVectors, updateResults, displayResults } from './calculations';
 import { analyzeShoulderPosition, analyzeElbowPosition, analyzeWristPosition, analyzeHipFlexion, analyzeLowerBackStrain, analyzeKneePosition, analyzeAnklePosition } from './analyzePositions';
 import { analyzeShoulderRehab, analyzeElbowRehab, analyzeWristRehab, analyzeHipRehab, analyzeLowerBackRehab, analyzeKneeRehab, analyzeAnkleRehab } from './analyzeRehabPositions';
-
-const calculateSquatAngles = (landmarks, theta_k, theta_a) => {
-  if (!landmarks || landmarks.length < 33) {
-    return { hipAngle: 0, backAngle: 0 };
-  }
-
-  const hip = landmarks[23];
-  const knee = landmarks[25];
-  const ankle = landmarks[27];
-  const shoulder = landmarks[11];
-
-  if (!hip || !knee || !ankle || !shoulder) {
-    return { hipAngle: 0, backAngle: 0 };
-  }
-
-  // Calculate the lengths of femur and tibia
-  const femurLength = calculateDistance(hip, knee);
-  const tibiaLength = calculateDistance(knee, ankle);
-
-  const R_f = femurLength / tibiaLength;
-  const torsoLength = calculateDistance(hip, shoulder);
-  const R_t = torsoLength / tibiaLength;
-
-  // Convert angles from degrees to radians for calculation
-  let theta_k_rad = theta_k * (Math.PI / 180);
-  let theta_a_rad = theta_a * (Math.PI / 180);
-
-  // Calculate Hip Angle (θ_h)
-  let cos_theta_h = (Math.cos(theta_k_rad) - R_f * Math.sin(theta_k_rad + theta_a_rad)) / Math.sqrt(1 + R_f ** 2);
-  let theta_h = Math.acos(cos_theta_h);
-  theta_h = theta_h * (180 / Math.PI); // Convert radians to degrees
-
-  // Calculate Back Angle (θ_b)
-  let theta_h_rad = theta_h * (Math.PI / 180); // Convert degrees to radians for sin function
-  let theta_b = Math.atan((R_f * Math.sin(theta_h_rad)) / R_t);
-  theta_b = theta_b * (180 / Math.PI); // Convert radians to degrees
-
-  return {
-    hipAngle: theta_h,
-    backAngle: theta_b,
-  };
-};
+import { calculateSquatAngles } from './calculateSquatAngles';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -78,6 +35,8 @@ function App() {
   const [selectedRehabInjuries, setSelectedRehabInjuries] = useState([]);
   const [repCount, setRepCount] = useState(0);
   const [repPeaks, setRepPeaks] = useState([]);
+  const [squatAngles, setSquatAngles] = useState({ hipAngle: 0, backAngle: 0 });
+
   const isSquattingRef = useRef(false);
   const currentPeakKneeAngleRef = useRef(0);
   const currentPeakHipAngleRef = useRef(0);
@@ -108,6 +67,8 @@ function App() {
   };
 
   const updateResultsCallback = useCallback((landmarks) => {
+    console.log("updateResultsCallback received landmarks:", landmarks);
+
     updateResults(
       landmarks,
       calculateAngle,
@@ -131,6 +92,15 @@ function App() {
     const rightHipAngle = calculateAngle(landmarks[12], landmarks[24], landmarks[26]);
     const combinedHipAngle = (leftHipAngle + rightHipAngle) / 2;
     const kneeAngle = (calculateAngle(landmarks[23], landmarks[25], landmarks[27]) + calculateAngle(landmarks[24], landmarks[26], landmarks[28])) / 2;
+
+    console.log("Calculated angles:", { leanAngle, footWidth, leftAnkleAngle, rightAnkleAngle, combinedAnkleAngle, leftHipAngle, rightHipAngle, combinedHipAngle, kneeAngle });
+
+    // Call calculateSquatAngles with correct landmarks
+    const angles = calculateSquatAngles(landmarks, desiredKneeAngle, desiredAnkleAngle);
+    console.log("Calculated squat angles:", angles);
+
+    // Update the state with the calculated squat angles
+    setSquatAngles(angles);
 
     if (!isSquattingRef.current && kneeAngle > 50) {
       isSquattingRef.current = true;
@@ -160,33 +130,15 @@ function App() {
       currentPeakLowerBackAngleRef.current = Math.max(currentPeakLowerBackAngleRef.current, leanAngle);
     }
 
-    // Lower back analysis
     const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
 
-    // Shoulder, elbow, and wrist analysis (existing)
-    const combinedWristAngle = (landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2;
-    const combinedShoulderAngle = (landmarks[11].y + landmarks[12].y) / 2;
-    const forwardLean = landmarks[23].y - landmarks[0].y;
-
-    const leftElbowToShoulderDistance = calculateDistance(landmarks[13], landmarks[11]);
-    const leftElbowToWristDistance = calculateDistance(landmarks[13], landmarks[15]);
-    const rightElbowToShoulderDistance = calculateDistance(landmarks[14], landmarks[12]);
-    const rightElbowToWristDistance = calculateDistance(landmarks[14], landmarks[16]);
-
-    const leftWristAngle = calculateAngle(landmarks[11], landmarks[13], landmarks[15]);
-    const rightWristAngle = calculateAngle(landmarks[12], landmarks[14], landmarks[16]);
-
-    const combinedElbowToShoulderDistance = (leftElbowToShoulderDistance + rightElbowToShoulderDistance) / 2;
-    const combinedElbowToWristDistance = (leftElbowToWristDistance + rightElbowToWristDistance) / 2;
-
-    const shoulderAdvice = analyzeShoulderPosition(combinedWristAngle, combinedShoulderAngle, forwardLean);
-    const elbowAdvice = analyzeElbowPosition(combinedElbowToShoulderDistance, combinedElbowToWristDistance);
-    const wristAdvice = analyzeWristPosition(leftWristAngle, rightWristAngle);
+    const shoulderAdvice = analyzeShoulderPosition((landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2, (landmarks[11].y + landmarks[12].y) / 2, landmarks[23].y - landmarks[0].y);
+    const elbowAdvice = analyzeElbowPosition((calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2, (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2);
+    const wristAdvice = analyzeWristPosition(calculateAngle(landmarks[11], landmarks[13], landmarks[15]), calculateAngle(landmarks[12], landmarks[14], landmarks[16]));
     const hipAdvice = analyzeHipFlexion(combinedHipAngle, combinedAnkleAngle, leanAngle);
     const kneeAdvice = analyzeKneePosition(kneeAngle);
     const ankleAdvice = analyzeAnklePosition(combinedAnkleAngle);
 
-    // Set shoulder, elbow, wrist, lower back, and hip advice separately
     setShoulderAdvice(shoulderAdvice);
     setElbowAdvice(elbowAdvice);
     setWristAdvice(wristAdvice);
@@ -196,9 +148,9 @@ function App() {
     setAnkleAdvice(ankleAdvice);
 
     // Rehabilitation analysis
-    const rehShoulderAdvice = analyzeShoulderRehab(combinedWristAngle, forwardLean);
-    const rehElbowAdvice = analyzeElbowRehab(combinedElbowToShoulderDistance, combinedElbowToWristDistance);
-    const rehWristAdvice = analyzeWristRehab(leftWristAngle, rightWristAngle);
+    const rehShoulderAdvice = analyzeShoulderRehab((landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2, landmarks[23].y - landmarks[0].y);
+    const rehElbowAdvice = analyzeElbowRehab((calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2, (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2);
+    const rehWristAdvice = analyzeWristRehab(calculateAngle(landmarks[11], landmarks[13], landmarks[15]), calculateAngle(landmarks[12], landmarks[14], landmarks[16]));
     const rehLowerBackAdvice = analyzeLowerBackRehab(leanAngle, footWidth, combinedAnkleAngle);
     const rehHipAdvice = analyzeHipRehab(combinedHipAngle, combinedAnkleAngle, leanAngle);
     const rehKneeAdvice = analyzeKneeRehab(kneeAngle);
@@ -219,6 +171,8 @@ function App() {
     setForceVecResults,
     setAnalysisMet,
     setResults,
+    desiredKneeAngle,
+    desiredAnkleAngle // Add missing dependencies here
   ]);
 
   const displayResultsCallback = useCallback((landmarksArray) => {
@@ -272,7 +226,7 @@ function App() {
       setDesiredKneeAngle={setDesiredKneeAngle}
       desiredAnkleAngle={desiredAnkleAngle}
       setDesiredAnkleAngle={setDesiredAnkleAngle}
-      calculateSquatAngles={calculateSquatAngles}
+      squatAngles={squatAngles} // Pass the calculated squat angles
     />
   );
 }

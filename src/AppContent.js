@@ -1,5 +1,3 @@
-// AppContent.js
-
 import React from 'react';
 
 const AppContent = ({
@@ -8,7 +6,7 @@ const AppContent = ({
   analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice,
   ankleAdvice, handleCheckboxChange, selectedInjuries, handleEnablePredictions, rehShoulderAdvice,
   rehElbowAdvice, rehWristAdvice, rehLowerBackAdvice, rehHipAdvice, rehKneeAdvice, rehAnkleAdvice,
-  selectedRehabInjuries, repCount, repPeaks, desiredKneeAngle, setDesiredKneeAngle, desiredAnkleAngle, setDesiredAnkleAngle, calculateSquatAngles
+  selectedRehabInjuries, repCount, repPeaks, desiredKneeAngle, setDesiredKneeAngle, desiredAnkleAngle, setDesiredAnkleAngle, squatAngles
 }) => {
   // Filter repPeaks to show every other output
   const filteredRepPeaks = repPeaks.filter((_, index) => index % 2 === 0);
@@ -142,8 +140,8 @@ const AppContent = ({
                       Desired Ankle Flexibility Angle:
                       <input type="number" value={desiredAnkleAngle} onChange={(e) => setDesiredAnkleAngle(e.target.value)} />
                     </label>
-                    <p>Hip Angle (θ_h): {calculateSquatAngles(1.125, 1.25, desiredKneeAngle, desiredAnkleAngle).hipAngle.toFixed(2)}</p>
-                    <p>Back Angle (θ_b): {calculateSquatAngles(1.125, 1.25, desiredKneeAngle, desiredAnkleAngle).backAngle.toFixed(2)}</p>
+                    <p>Hip Angle: {squatAngles.hipAngle.toFixed(2)}</p>
+                    <p>Back Angle: {squatAngles.backAngle.toFixed(2)}</p>
                   </div>
                 )}
 
