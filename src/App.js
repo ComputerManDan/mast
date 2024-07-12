@@ -2,11 +2,22 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { loadPoseLandmarker } from "./poseLandmarker";
 import AppContent from './AppContent';
-import { calculateAngle, calculateDistance, calculateForceVectors, updateResults, displayResults } from './calculations';
-import { analyzeShoulderPosition, analyzeElbowPosition, analyzeWristPosition, analyzeHipFlexion, analyzeLowerBackStrain, analyzeKneePosition, analyzeAnklePosition } from './analyzePositions';
-import { analyzeShoulderRehab, analyzeElbowRehab, analyzeWristRehab, analyzeHipRehab, analyzeLowerBackRehab, analyzeKneeRehab, analyzeAnkleRehab } from './analyzeRehabPositions';
+import {
+  calculateAngle, calculateDistance, calculateForceVectors, updateResults, displayResults
+} from './calculations';
+import {
+  analyzeShoulderPosition, analyzeElbowPosition, analyzeWristPosition, analyzeHipFlexion,
+  analyzeLowerBackStrain, analyzeKneePosition, analyzeAnklePosition
+} from './analyzePositions';
+import {
+  analyzeShoulderRehab, analyzeElbowRehab, analyzeWristRehab, analyzeHipRehab, analyzeLowerBackRehab,
+  analyzeKneeRehab, analyzeAnkleRehab
+} from './analyzeRehabPositions';
 import { calculateSquatAngles } from './calculateSquatAngles';
 
+/**
+ * Main App component for Musculoskeletal Analysis Squat Tool.
+ */
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -31,7 +42,7 @@ function App() {
   const [rehLowerBackAdvice, setRehLowerBackAdvice] = useState(''); 
   const [rehHipAdvice, setRehHipAdvice] = useState(''); 
   const [rehKneeAdvice, setRehKneeAdvice] = useState('');
-  const [rehAnkleAdvice, setRehAnkleAdvice] = useState([]);
+  const [rehAnkleAdvice, setRehAnkleAdvice] = useState('');
   const [selectedRehabInjuries, setSelectedRehabInjuries] = useState([]);
   const [repCount, setRepCount] = useState(0);
   const [repPeaks, setRepPeaks] = useState([]);
@@ -45,6 +56,9 @@ function App() {
   const [desiredKneeAngle, setDesiredKneeAngle] = useState(90); // User input for desired knee angle
   const [desiredAnkleAngle, setDesiredAnkleAngle] = useState(20); // User input for desired ankle flexibility angle
 
+  /**
+   * Handle checkbox changes for injury and rehab options.
+   */
   const handleCheckboxChange = (event) => {
     const { name, value } = event.target;
     if (name === 'injOptions') {
@@ -62,13 +76,17 @@ function App() {
     }
   };
 
+  /**
+   * Enable webcam for predictions.
+   */
   const handleEnablePredictions = () => {
     setIsWebcamEnabled(true);
   };
 
+  /**
+   * Update results callback for pose landmarks.
+   */
   const updateResultsCallback = useCallback((landmarks) => {
-    console.log("updateResultsCallback received landmarks:", landmarks);
-
     updateResults(
       landmarks,
       calculateAngle,
@@ -93,12 +111,9 @@ function App() {
     const combinedHipAngle = (leftHipAngle + rightHipAngle) / 2;
     const kneeAngle = (calculateAngle(landmarks[23], landmarks[25], landmarks[27]) + calculateAngle(landmarks[24], landmarks[26], landmarks[28])) / 2;
 
-    console.log("Calculated angles:", { leanAngle, footWidth, leftAnkleAngle, rightAnkleAngle, combinedAnkleAngle, leftHipAngle, rightHipAngle, combinedHipAngle, kneeAngle });
-
     // Call calculateSquatAngles with correct landmarks
     const angles = calculateSquatAngles(landmarks, desiredKneeAngle, desiredAnkleAngle);
-    console.log("Calculated squat angles:", angles);
-
+    
     // Update the state with the calculated squat angles
     setSquatAngles(angles);
 
@@ -131,10 +146,19 @@ function App() {
     }
 
     const lowerBackAdvice = analyzeLowerBackStrain(leanAngle, footWidth, combinedAnkleAngle);
-
-    const shoulderAdvice = analyzeShoulderPosition((landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2, (landmarks[11].y + landmarks[12].y) / 2, landmarks[23].y - landmarks[0].y);
-    const elbowAdvice = analyzeElbowPosition((calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2, (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2);
-    const wristAdvice = analyzeWristPosition(calculateAngle(landmarks[11], landmarks[13], landmarks[15]), calculateAngle(landmarks[12], landmarks[14], landmarks[16]));
+    const shoulderAdvice = analyzeShoulderPosition(
+      (landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2,
+      (landmarks[11].y + landmarks[12].y) / 2,
+      landmarks[23].y - landmarks[0].y
+    );
+    const elbowAdvice = analyzeElbowPosition(
+      (calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2,
+      (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2
+    );
+    const wristAdvice = analyzeWristPosition(
+      calculateAngle(landmarks[11], landmarks[13], landmarks[15]),
+      calculateAngle(landmarks[12], landmarks[14], landmarks[16])
+    );
     const hipAdvice = analyzeHipFlexion(combinedHipAngle, combinedAnkleAngle, leanAngle);
     const kneeAdvice = analyzeKneePosition(kneeAngle);
     const ankleAdvice = analyzeAnklePosition(combinedAnkleAngle);
@@ -148,9 +172,18 @@ function App() {
     setAnkleAdvice(ankleAdvice);
 
     // Rehabilitation analysis
-    const rehShoulderAdvice = analyzeShoulderRehab((landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2, landmarks[23].y - landmarks[0].y);
-    const rehElbowAdvice = analyzeElbowRehab((calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2, (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2);
-    const rehWristAdvice = analyzeWristRehab(calculateAngle(landmarks[11], landmarks[13], landmarks[15]), calculateAngle(landmarks[12], landmarks[14], landmarks[16]));
+    const rehShoulderAdvice = analyzeShoulderRehab(
+      (landmarks[15].y + landmarks[16].y) / 2 - (landmarks[11].y + landmarks[12].y) / 2,
+      landmarks[23].y - landmarks[0].y
+    );
+    const rehElbowAdvice = analyzeElbowRehab(
+      (calculateDistance(landmarks[13], landmarks[11]) + calculateDistance(landmarks[14], landmarks[12])) / 2,
+      (calculateDistance(landmarks[13], landmarks[15]) + calculateDistance(landmarks[14], landmarks[16])) / 2
+    );
+    const rehWristAdvice = analyzeWristRehab(
+      calculateAngle(landmarks[11], landmarks[13], landmarks[15]),
+      calculateAngle(landmarks[12], landmarks[14], landmarks[16])
+    );
     const rehLowerBackAdvice = analyzeLowerBackRehab(leanAngle, footWidth, combinedAnkleAngle);
     const rehHipAdvice = analyzeHipRehab(combinedHipAngle, combinedAnkleAngle, leanAngle);
     const rehKneeAdvice = analyzeKneeRehab(kneeAngle);
@@ -163,22 +196,21 @@ function App() {
     setRehHipAdvice(rehHipAdvice);
     setRehKneeAdvice(rehKneeAdvice);
     setRehAnkleAdvice(rehAnkleAdvice);
-
   }, [
-    bodyWeight,
-    additionalWeight,
-    weightUnit,
-    setForceVecResults,
-    setAnalysisMet,
-    setResults,
-    desiredKneeAngle,
-    desiredAnkleAngle // Add missing dependencies here
+    bodyWeight, additionalWeight, weightUnit, setForceVecResults, setAnalysisMet, setResults,
+    desiredKneeAngle, desiredAnkleAngle
   ]);
 
+  /**
+   * Display results callback for landmarks array.
+   */
   const displayResultsCallback = useCallback((landmarksArray) => {
     displayResults(landmarksArray, updateResultsCallback, setResults);
   }, [updateResultsCallback, setResults]);
 
+  /**
+   * Load pose landmarker on component mount.
+   */
   useEffect(() => {
     const loadLandmarker = async () => {
       await loadPoseLandmarker(setIsWebcamEnabled, setLoading, displayResultsCallback, showSplash);
@@ -226,7 +258,7 @@ function App() {
       setDesiredKneeAngle={setDesiredKneeAngle}
       desiredAnkleAngle={desiredAnkleAngle}
       setDesiredAnkleAngle={setDesiredAnkleAngle}
-      squatAngles={squatAngles} // Pass the calculated squat angles
+      squatAngles={squatAngles}
     />
   );
 }

@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
+/**
+ * Main content component for the application.
+ * Displays splash screen, main content, and results based on user interactions.
+ */
 const AppContent = ({
   showSplash, setShowSplash, bodyWeight, setBodyWeight, additionalWeight, setAdditionalWeight,
   weightUnit, setWeightUnit, isWebcamEnabled, setIsWebcamEnabled, loading, results, forceVecResults,
   analysisMet, shoulderAdvice, elbowAdvice, wristAdvice, lowerBackAdvice, hipAdvice, kneeAdvice,
   ankleAdvice, handleCheckboxChange, selectedInjuries, handleEnablePredictions, rehShoulderAdvice,
   rehElbowAdvice, rehWristAdvice, rehLowerBackAdvice, rehHipAdvice, rehKneeAdvice, rehAnkleAdvice,
-  selectedRehabInjuries, repCount, repPeaks, desiredKneeAngle, setDesiredKneeAngle, desiredAnkleAngle, setDesiredAnkleAngle, squatAngles
+  selectedRehabInjuries, repCount, repPeaks, desiredKneeAngle, setDesiredKneeAngle, desiredAnkleAngle,
+  setDesiredAnkleAngle, squatAngles
 }) => {
   // Filter repPeaks to show every other output
-  const filteredRepPeaks = repPeaks.filter((_, index) => index % 2 === 0);
+  const filteredRepPeaks = useMemo(() => repPeaks.filter((_, index) => index % 2 === 0), [repPeaks]);
 
   return (
     <div>
-      {showSplash && (
+      {showSplash ? (
         <div className="splash-screen" onClick={() => setShowSplash(false)}>
           <div className="splash-content">
             <img src="exeter.jpg" alt="Exeter University Background" id="splash-uni"/>
@@ -21,80 +26,91 @@ const AppContent = ({
             <h2 className="splash-text">Tap to Continue</h2>
           </div>
         </div>
-      )}
-      {!showSplash && (
+      ) : (
         <div className="wrapper">
           <header>
             <h1>Musculoskeletal Analysis Squat Tool</h1>
           </header>
           <section>
             <div className="button-group">
-              <div className="dropdown">
-                <button id="athButton" className="mdc-button mdc-button--raised dropdown-toggle">
-                  <span className="mdc-button__label">Athletic performance</span>
-                </button>
-                <div className="dropdown-content">
-                  <label><input type="radio" name="injOptions" value="lift" onChange={handleCheckboxChange} /> Max Lift</label>
-                  <label><input type="radio" name="injOptions" value="quad" onChange={handleCheckboxChange} /> Quadriceps Bias</label>
-                  <label><input type="radio" name="injOptions" value="post" onChange={handleCheckboxChange} /> Posterior chain Bias</label>
+              {["Athletic performance", "Injury prevention", "Injury Rehabilitation"].map((label, index) => (
+                <div key={index} className="dropdown">
+                  <button id={`${label.replace(' ', '').toLowerCase()}Button`}
+                    className="mdc-button mdc-button--raised dropdown-toggle">
+                    <span className="mdc-button__label">{label}</span>
+                  </button>
+                  <div className="dropdown-content">
+                    {label === "Athletic performance" && (
+                      <>
+                        <label>
+                          <input type="radio" name="injOptions" value="lift" onChange={handleCheckboxChange} /> Max Lift
+                        </label>
+                        <label>
+                          <input type="radio" name="injOptions" value="quad" onChange={handleCheckboxChange} /> Quadriceps Bias
+                        </label>
+                        <label>
+                          <input type="radio" name="injOptions" value="post" onChange={handleCheckboxChange} /> Posterior chain Bias
+                        </label>
+                      </>
+                    )}
+                    {label === "Injury prevention" && (
+                      <>
+                        {["shoulders", "elbows", "wrists", "back", "hips", "knees", "ankles"].map(injury => (
+                          <label key={injury}>
+                            <input type="checkbox" name="injOptions" value={injury} onChange={handleCheckboxChange} /> 
+                            {injury.charAt(0).toUpperCase() + injury.slice(1)}
+                          </label>
+                        ))}
+                      </>
+                    )}
+                    {label === "Injury Rehabilitation" && (
+                      <>
+                        {["shoulders", "elbows", "wrists", "back", "hips", "knees", "ankles"].map(rehab => (
+                          <label key={rehab}>
+                            <input type="checkbox" name="rehOptions" value={rehab} onChange={handleCheckboxChange} /> 
+                            {rehab.charAt(0).toUpperCase() + rehab.slice(1)}
+                          </label>
+                        ))}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="dropdown">
-                <button id="injButton" className="mdc-button mdc-button--raised dropdown-toggle">
-                  <span className="mdc-button__label">Injury prevention</span>
-                </button>
-                <div className="dropdown-content">
-                  <label><input type="checkbox" name="injOptions" value="shoulders" onChange={handleCheckboxChange} /> Shoulders</label>
-                  <label><input type="checkbox" name="injOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
-                  <label><input type="checkbox" name="injOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
-                  <label><input type="checkbox" name="injOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
-                  <label><input type="checkbox" name="injOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
-                  <label><input type="checkbox" name="injOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
-                  <label><input type="checkbox" name="injOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
-                </div>
-              </div>
-              <div className="dropdown">
-                <button id="rehButton" className="mdc-button mdc-button--raised dropdown-toggle">
-                  <span className="mdc-button__label">Injury Rehabilitation</span>
-                </button>
-                <div className="dropdown-content">
-                  <label><input type="checkbox" name="rehOptions" value="shoulders" onChange={handleCheckboxChange} /> Shoulders</label>
-                  <label><input type="checkbox" name="rehOptions" value="elbows" onChange={handleCheckboxChange} /> Elbows</label>
-                  <label><input type="checkbox" name="rehOptions" value="wrists" onChange={handleCheckboxChange} /> Wrists</label>
-                  <label><input type="checkbox" name="rehOptions" value="back" onChange={handleCheckboxChange} /> Lower Back</label>
-                  <label><input type="checkbox" name="rehOptions" value="hips" onChange={handleCheckboxChange} /> Hips</label>
-                  <label><input type="checkbox" name="rehOptions" value="knees" onChange={handleCheckboxChange} /> Knees</label>
-                  <label><input type="checkbox" name="rehOptions" value="ankles" onChange={handleCheckboxChange} /> Ankles</label>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
           <main id="demos" className="invisible">
-            <button id="webcamButton" className="mdc-button mdc-button--raised" onClick={() => handleEnablePredictions(!isWebcamEnabled)}>
+            <button id="webcamButton" className="mdc-button mdc-button--raised"
+              onClick={() => handleEnablePredictions(!isWebcamEnabled)}>
               <span className="mdc-button__ripple"></span>
               <span className="mdc-button__label">{isWebcamEnabled ? 'STOP' : 'ENABLE WEBCAM'}</span>
             </button>
             <div id="weights">
-              <label className="weightLabel">
-                Body Weight:
-                <input type="number" value={bodyWeight} onChange={(e) => setBodyWeight(e.target.value)} className="inputs"/>
-              </label>
-              <label className="weightLabel">
-                Additional Weight:
-                <input type="number" value={additionalWeight} onChange={(e) => setAdditionalWeight(e.target.value)} className="inputs"/>
-              </label>
-              <label className="weightLabel">
-                Unit:
-                <select value={weightUnit} onChange={(e) => setWeightUnit(e.target.value)} className="inputs">
-                  <option value="kg">Kg</option>
-                  <option value="lbs">Lbs</option>
-                </select>
-              </label>
+              {[
+                { label: "Body Weight:", value: bodyWeight, setter: setBodyWeight },
+                { label: "Additional Weight:", value: additionalWeight, setter: setAdditionalWeight },
+                { label: "Unit:", value: weightUnit, setter: setWeightUnit, options: ["kg", "lbs"] }
+              ].map(({ label, value, setter, options }, index) => (
+                <label key={index} className="weightLabel">
+                  {label}
+                  {options ? (
+                    <select value={value} onChange={(e) => setter(e.target.value)} className="inputs">
+                      {options.map(option => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  ) : (
+                    <input type="number" value={value} onChange={(e) => setter(e.target.value)} className="inputs"/>
+                  )}
+                </label>
+              ))}
             </div>
             <div id="video">
               {!isWebcamEnabled && <img src="logomast.png" alt="Placeholder" style={{ width: '1280px', height: '720px' }} />}
-              <video id="webcam" style={{ width: '1280px', height: '720px', position: isWebcamEnabled ? 'absolute' : 'relative', display: isWebcamEnabled ? 'block' : 'none' }} autoPlay playsInline></video>
-              <canvas className="output_canvas" id="output_canvas" width="1280" height="720" style={{ display: isWebcamEnabled && !loading ? 'block' : 'none' }}></canvas>
+              <video id="webcam" style={{
+                width: '1280px', height: '720px',
+                position: isWebcamEnabled ? 'absolute' : 'relative',
+                display: isWebcamEnabled ? 'block' : 'none'
+              }} autoPlay playsInline></video>
+              <canvas className="output_canvas" id="output_canvas" width="1280" height="720"
+                style={{ display: isWebcamEnabled && !loading ? 'block' : 'none' }}></canvas>
               {loading && (
                 <div className="loading-background">
                   <div className="loading-overlay">
@@ -117,7 +133,10 @@ const AppContent = ({
                 <h3>Peaks & Reps</h3>
                 <p>Reps: {repCount}</p>
                 {filteredRepPeaks.map((peak, index) => (
-                  <p key={index}>Rep {peak.rep}: Knee Angle: {peak.kneeAngle.toFixed(2)}, Hip Angle: {peak.hipAngle.toFixed(2)}, Lower Back Angle: {peak.lowerBackAngle.toFixed(2)}</p>
+                  <p key={index}>
+                    Rep {peak.rep}: Knee Angle: {peak.kneeAngle.toFixed(2)}, Hip Angle: {peak.hipAngle.toFixed(2)},
+                    Lower Back Angle: {peak.lowerBackAngle.toFixed(2)}
+                  </p>
                 ))}
               </div>
               <div className="forceVec">
@@ -144,7 +163,6 @@ const AppContent = ({
                     <p>Back Angle: {squatAngles.backAngle.toFixed(2)}</p>
                   </div>
                 )}
-
                 {selectedInjuries.includes("quad") && (
                   <>
                     <p>To increase these have more knee flexion:</p>
@@ -161,7 +179,6 @@ const AppContent = ({
                     ))}
                   </>
                 )}
-
                 {selectedInjuries.includes("post") && (
                   <>
                     <p>To increase these have more hip flexion and forward lean to compensate if needed:</p>
@@ -170,7 +187,7 @@ const AppContent = ({
                     ).map((result, index) => (
                       <p key={index}>{result}</p>
                     ))}
-                    <p> This will result in less knee flexion and decrease these:</p>
+                    <p>This will result in less knee flexion and decrease these:</p>
                     {analysisMet.filter(result =>
                       result.includes("Quadriceps Force") || result.includes("Knee Torque")
                     ).map((result, index) => (
@@ -179,7 +196,6 @@ const AppContent = ({
                   </>
                 )}
               </div>
-
               <div className="InjPrev">
                 <h3>Injury Prevention</h3>
                 {selectedInjuries.includes("shoulders") && shoulderAdvice && <p>{shoulderAdvice}</p>}
@@ -203,7 +219,9 @@ const AppContent = ({
             </div>
           </section>
           <footer>
-            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact us at <a href="mailto:di236@exeter.ac.uk">di236@exeter.ac.uk</a>.</p>
+            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact us at
+              <a href="mailto:di236@exeter.ac.uk">di236@exeter.ac.uk</a>.
+            </p>
           </footer>
         </div>
       )}
@@ -211,4 +229,4 @@ const AppContent = ({
   );
 };
 
-export default AppContent;
+export default React.memo(AppContent);
