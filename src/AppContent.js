@@ -31,7 +31,7 @@ const AppContent = ({
           <header>
             <h1>Musculoskeletal Analysis Squat Tool</h1>
           </header>
-          <section>
+          <section >
             <div className="button-group">
               {["Athletic performance", "Injury prevention", "Injury Rehabilitation"].map((label, index) => (
                 <div key={index} className="dropdown">
@@ -103,9 +103,9 @@ const AppContent = ({
               ))}
             </div>
             <div id="video">
-              {!isWebcamEnabled && <img src="logomast.png" alt="Placeholder" style={{ width: '1280px', height: '720px' }} />}
+              {!isWebcamEnabled && <img src="instructions.png" alt="Placeholder" style={{ width: '80em', height: 'auto !important', objectFit: 'cover' }} />}
               <video id="webcam" style={{
-                width: '1280px', height: '720px',
+                width: '80em', height: '45em',
                 position: isWebcamEnabled ? 'absolute' : 'relative',
                 display: isWebcamEnabled ? 'block' : 'none'
               }} autoPlay playsInline></video>
@@ -122,30 +122,6 @@ const AppContent = ({
           </main>
           <section>
             <h2>Results</h2>
-            <div className="results">
-              <div className="angles">
-                <h3>Angles</h3>
-                {results.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
-              <div className="peaks">
-                <h3>Peaks & Reps</h3>
-                <p>Reps: {repCount}</p>
-                {filteredRepPeaks.map((peak, index) => (
-                  <p key={index}>
-                    Rep {peak.rep}: Knee Angle: {peak.kneeAngle.toFixed(2)}, Hip Angle: {peak.hipAngle.toFixed(2)},
-                    Lower Back Angle: {peak.lowerBackAngle.toFixed(2)}
-                  </p>
-                ))}
-              </div>
-              <div className="forceVec">
-                <h3>Loads at joints</h3>
-                {forceVecResults.map((result, index) => (
-                  <p key={index}>{result}</p>
-                ))}
-              </div>
-            </div>
             <div className="results">
               <div className="analysisMet">
                 <h3>Performance</h3>
@@ -217,9 +193,33 @@ const AppContent = ({
                 {selectedRehabInjuries.includes("ankles") && rehAnkleAdvice && <p>{rehAnkleAdvice}</p>}
               </div>
             </div>
+            <div className="results">
+              <div className="angles">
+                <h3>Angles</h3>
+                {results.map((result, index) => (
+                  <p key={index}>{result}</p>
+                ))}
+              </div>
+              <div className="peaks">
+                <h3>Peaks & Reps</h3>
+                <p>Reps: {repCount}</p>
+                {filteredRepPeaks.map((peak, index) => (
+                  <p key={index}>
+                    Rep {peak.rep}: Knee Angle: {peak.kneeAngle.toFixed(2)}, Hip Angle: {peak.hipAngle.toFixed(2)},
+                    Lower Back Angle: {peak.lowerBackAngle.toFixed(2)}
+                  </p>
+                ))}
+              </div>
+              <div className="forceVec">
+                <h3>Loads at joints</h3>
+                {forceVecResults.map((result, index) => (
+                  <p key={index}>{result}</p>
+                ))}
+              </div>
+            </div>
           </section>
           <footer>
-            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact us at
+            <p>&copy; 2024 Musculoskeletal Analysis Squat Tool. All rights reserved. For inquiries, contact me at:
               <a href="mailto:di236@exeter.ac.uk">di236@exeter.ac.uk</a>.
             </p>
           </footer>

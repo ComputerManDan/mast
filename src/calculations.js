@@ -207,12 +207,12 @@ export const updateResults = (
   const formattedResults = [
       `Head angle: ${Number(combinedAngleDegrees).toFixed(2)} degrees (Front view: ${Number(adjustedFrontViewAngle).toFixed(2)}, Side view: ${Number(adjustedSideViewAngle).toFixed(2)})`,
       `Spinal uprightness / Shoulder torque: ${Number(shoulderUprightness).toFixed(2)} degrees`,
-      `Combined elbow angle: ${Number(combinedElbowAngle).toFixed(2)} degrees (Left elbow angle: ${Number(leftElbowAngle).toFixed(2)} degrees) (Right elbow angle: ${Number(rightElbowAngle).toFixed(2)} degrees)`,
-      `Combined wrist angle: ${Number(combinedWristAngle).toFixed(2)} degrees (Left wrist angle: ${Number(leftWristAngle).toFixed(2)} degrees) (Right wrist angle: ${Number(rightWristAngle).toFixed(2)} degrees)`,
-      `Combined hip angle: ${Number(combinedHipAngle).toFixed(2)} degrees (Left hip angle: ${Number(leftHipAngle).toFixed(2)} degrees) (Right hip angle: ${Number(rightHipAngle).toFixed(2)} degrees)`,
-      `Combined knee angle: ${Number(combinedKneeAngle).toFixed(2)} degrees (Left knee angle: ${Number(leftKneeAngle).toFixed(2)} degrees) (Right knee angle: ${Number(rightKneeAngle).toFixed(2)} degrees)`,
-      `Combined ankle angle: ${Number(combinedAnkleAngle).toFixed(2)} degrees (Left ankle angle: ${Number(leftAnkleAngle).toFixed(2)} degrees) (Right ankle angle: ${Number(rightAnkleAngle).toFixed(2)} degrees)`,
-      `Combined foot angle: ${Number(combinedFootAngle).toFixed(2)} degrees (Left foot angle: ${Number(leftFootAngle).toFixed(2)} degrees) (Right foot angle: ${Number(rightFootAngle).toFixed(2)} degrees)`,
+      `Elbow: ${Number(combinedElbowAngle).toFixed(2)} degrees (Left: ${Number(leftElbowAngle).toFixed(2)} degrees) (Right: ${Number(rightElbowAngle).toFixed(2)} degrees)`,
+      `Wrist: ${Number(combinedWristAngle).toFixed(2)} degrees (Left: ${Number(leftWristAngle).toFixed(2)} degrees) (Right: ${Number(rightWristAngle).toFixed(2)} degrees)`,
+      `Hip: ${Number(combinedHipAngle).toFixed(2)} degrees (Left: ${Number(leftHipAngle).toFixed(2)} degrees) (Right: ${Number(rightHipAngle).toFixed(2)} degrees)`,
+      `Knee: ${Number(combinedKneeAngle).toFixed(2)} degrees (Left: ${Number(leftKneeAngle).toFixed(2)} degrees) (Right: ${Number(rightKneeAngle).toFixed(2)} degrees)`,
+      `Ankle: ${Number(combinedAnkleAngle).toFixed(2)} degrees (Left: ${Number(leftAnkleAngle).toFixed(2)} degrees) (Right: ${Number(rightAnkleAngle).toFixed(2)} degrees)`,
+      `Foot: ${Number(combinedFootAngle).toFixed(2)} degrees (Left: ${Number(leftFootAngle).toFixed(2)} degrees) (Right: ${Number(rightFootAngle).toFixed(2)} degrees)`,
   ];
 
   setResults(formattedResults);
