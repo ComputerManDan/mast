@@ -21,6 +21,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   
+<<<<<<< HEAD
   // Don't cache media stream requests or camera access
   if (event.request.url.includes('mediaDevices') || 
       event.request.url.includes('getUserMedia') ||
@@ -29,6 +30,8 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+=======
+>>>>>>> dacae9a69272962ed31447305702961b3eefa817
   event.respondWith(
     caches.match(event.request)
       .then(response => response || fetch(event.request))
