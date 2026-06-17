@@ -11,12 +11,18 @@ root.render(
   </React.StrictMode>
 );
 
-// Register service worker for PWA functionality
+// Register service worker for PWA functionality with error handling
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('Service Worker registered'))
-      .catch(err => console.log('Service Worker registration failed:', err));
+      .then(reg => {
+        console.log('Service Worker registered successfully');
+      })
+      .catch(err => {
+        console.warn('Service Worker registration failed:', err);
+        console.warn('App will still work, but without offline support');
+        // Don't throw - app should still work with camera even if SW fails
+      });
   });
 }
 
