@@ -1,0 +1,18 @@
+{
+  "short_name": "Squat Analysis",
+  "name": "Musculoskeletal Analysis Squat Tool",
+  "description": "Real-time biomechanical analysis for squat form, injury prevention, and rehabilitation",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#207178",
+  "background_color": "#ffffff",
+  "permissions": ["camera", "microphone"]
+}
