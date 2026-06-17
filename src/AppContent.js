@@ -104,7 +104,6 @@ const AppContent = ({
             </div>
             <div id="video">
               {!isWebcamEnabled && <img src="instructions.png" alt="Placeholder" style={{ width: '100%', maxWidth: '80em', height: 'auto', objectFit: 'cover' }} />}
-<<<<<<< HEAD
               <video 
                 id="webcam" 
                 style={{
@@ -120,17 +119,6 @@ const AppContent = ({
                 playsInline
                 muted
               ></video>
-=======
-              <video id="webcam" style={{
-                width: '100%',
-                maxWidth: '80em',
-                height: 'auto',
-                position: isWebcamEnabled ? 'absolute' : 'relative',
-                display: isWebcamEnabled ? 'block' : 'none',
-                top: 0,
-                left: 0
-              }} autoPlay playsInline></video>
->>>>>>> dacae9a69272962ed31447305702961b3eefa817
               <canvas className="output_canvas" id="output_canvas"
                 style={{ 
                   display: isWebcamEnabled && !loading ? 'block' : 'none',

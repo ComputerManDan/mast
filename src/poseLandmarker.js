@@ -94,21 +94,17 @@ export const loadPoseLandmarker = async (setIsWebcamEnabled, setLoading, display
           webcamRunning = false;
           enableWebcamButton.innerText = "ENABLE PREDICTIONS";
           setIsWebcamEnabled(false);
-<<<<<<< HEAD
           
           // Stop all video tracks
           if (video.srcObject) {
             video.srcObject.getTracks().forEach(track => track.stop());
             video.srcObject = null;
           }
-=======
->>>>>>> dacae9a69272962ed31447305702961b3eefa817
         } else {
           webcamRunning = true;
           enableWebcamButton.innerText = "STOP";
           setLoading(true);
           setIsWebcamEnabled(true);
-<<<<<<< HEAD
 
           try {
             // Enhanced constraints for better mobile support
@@ -171,28 +167,14 @@ export const loadPoseLandmarker = async (setIsWebcamEnabled, setLoading, display
             alert(errorMessage);
           }
         }
-=======
-        }
-
-        const constraints = { video: { facingMode: "user" } };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        video.addEventListener("loadeddata", () => {
-          setLoading(false);
-          predictWebcam();
-        });
->>>>>>> dacae9a69272962ed31447305702961b3eefa817
       }
 
       let lastVideoTime = -1;
       async function predictWebcam() {
-<<<<<<< HEAD
         if (!webcamRunning) {
           return;
         }
 
-=======
->>>>>>> dacae9a69272962ed31447305702961b3eefa817
         if (!video.videoWidth || !video.videoHeight) {
           requestAnimationFrame(predictWebcam);
           return;
